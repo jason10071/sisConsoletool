@@ -17,7 +17,8 @@ class ApplicationParameter
             DUMP_ROM,
             SOFT_RESET,
             GET_FW_MODE,
-            CHECK_ITO
+            CHECK_ITO,
+			TOUCH_FINDER
         };
         enum {
             DEFAULT_CALIBRATION_TIME = 5

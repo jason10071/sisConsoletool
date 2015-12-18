@@ -25,12 +25,14 @@ public:
 
 	const char* autoDetectDevicePath();
 	SisTouchFinder::DeviceType getDeviceType();
+
+	bool isSisTouchHid(const char* deviceName);
+	bool isSisTouchI2c(const char* deviceName);
 	
 private:
 	/* Detect hidraw* */
 	const char* autoDetectHidDevicePath();
-	bool isSisTouchHid(const char* deviceName);
-
+	
 	/*=====================================================*/
     /* hid-example.c */
 	/*
@@ -50,7 +52,6 @@ private:
 
 	/* Detect i2c-* */
 	const char* autoDetectI2cDevicePath();
-	bool isSisTouchI2c(const char* deviceName);
 
 private:
 	int m_vId;

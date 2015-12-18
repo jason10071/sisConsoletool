@@ -455,27 +455,52 @@ SiSTouchIO::getDeviceType(int max_retry, int retry_delay, int verbose, int ioDel
 
 	if(detectHidrawFlag == 1)
 	{
+        // only detect hidraw
+		if( strlen(m_activeDeviceName) == 0 )
+		{
+		    SisTouchFinder sisTouchFinder;
+        	const char* deviceName = sisTouchFinder.autoDetectDevicePath();
 	
-	// only detect hidraw
+        	if(deviceName != 0)
+        	{
+            	if(sisTouchFinder.getDeviceType() == SisTouchFinder::USB_817)
+            	{
+                	con = CON_AEGIS_MULTI_FOR_NEW_DRIVER;
+            	}
+				else if(sisTouchFinder.getDeviceType() == SisTouchFinder::I2C_817)
+				{
+			    	con = CON_AEGIS_I2C_FOR_NEW_DRIVER;
+				}
 
-		printf("Only detect hidraw\n");
-	
-        SisTouchFinder sisTouchFinder;
-        const char* deviceName = sisTouchFinder.autoDetectDevicePath();
-	
-        if(deviceName != 0)
-        {
-            if(sisTouchFinder.getDeviceType() == SisTouchFinder::USB_817)
-            {
+            	strcpy(m_activeDeviceName, deviceName);
+				delete deviceName;
+
+            	printf("find activeDeviceName=%s, ", m_activeDeviceName);
+            	return con;
+        	}
+			
+		}
+		else
+		{
+            SisTouchFinder sisTouchFinder;
+            if( !sisTouchFinder.isSisTouchHid(m_activeDeviceName) )
+			{
+			    printf("activeDeviceName=%s is not sis touch, ", m_activeDeviceName);
+                return con;
+			}
+			
+			if( strstr( m_activeDeviceName, "/dev/hidraw" ) == m_activeDeviceName )
+        	{
                 con = CON_AEGIS_MULTI_FOR_NEW_DRIVER;
             }
+			else if( strstr( m_activeDeviceName, "/dev/i2c" ) == m_activeDeviceName)
+			{
+		    	con = CON_AEGIS_I2C_FOR_NEW_DRIVER;
+			}
 
-            strcpy(m_activeDeviceName, deviceName);
-			delete deviceName;
-
-            printf("find activeDeviceName=%s, ", m_activeDeviceName);
+			printf("activeDeviceName=%s, ", m_activeDeviceName);
             return con;
-        }
+		}
     }
 
 	return con;

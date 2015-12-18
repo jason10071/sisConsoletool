@@ -9,6 +9,7 @@
 #include "SoftResetParameter.h"
 #include "GetFwModeParameter.h"
 #include "CheckITOParameter.h"
+#include "TouchFinderParameter.h"
 
 /*===========================================================================*/
 ApplicationParameter * ApplicationParameter::create(ApplicationType type)
@@ -54,6 +55,10 @@ ApplicationParameter * ApplicationParameter::create(ApplicationType type)
 
         case CHECK_ITO:
         	p = new CheckITOParameter();
+        	break;
+			
+		case TOUCH_FINDER:
+        	p = new TouchFinderParameter();
         	break;
 
         default:

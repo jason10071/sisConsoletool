@@ -128,10 +128,11 @@ bool SiSTouchAdapter::write_buffer_to_address( int* buf, int offset, int buf_siz
 
         int idx_base = offset / sizeof(int);
 
-        for(int block_retry = 0; block_retry < 33; block_retry++)
+        int MAX_block_retry = 3;
+        for(int block_retry = 0; block_retry < MAX_block_retry; block_retry++)
         {
             ret = 0;
-            printf("block_retry: %d of max 33\n", block_retry+1 );
+            printf("block_retry: %d of max %d\n", block_retry+1, MAX_block_retry );
 
             printf("Write to addr = %08x pack_num=%d \n", addr, pack_num);
 
@@ -173,8 +174,8 @@ bool SiSTouchAdapter::write_buffer_to_address( int* buf, int offset, int buf_siz
             }
 
             ret = m_io->call_04();
-			printf( "waiting for Query(0x04)\n" );
-            usleep(1 * 1000 * 1000);
+			//printf( "waiting for Query(0x04)\n" );
+            //usleep(1 * 1000 * 1000);
 
             if ( ret < 0 )
             {
