@@ -78,6 +78,69 @@ SiSTouch_Aegis_Multi_FOR_NEW_DRIVER::get_device_name()
 }
 
 int
+SiSTouch_Aegis_Multi_FOR_NEW_DRIVER::sis_usb_stop(void)
+{
+#ifdef VIA_IOCTL
+    const char* devName = SiSTouchIO::getActiveDeviceName();
+    if (devName==NULL)
+    	devName = DEVICE_NAME;
+    LOGI("%s: devName = %s\n", __FUNCTION__, devName);
+
+    if(m_fd >= 0)
+    {
+        //close(m_fd);
+        m_fd = -1;
+    }
+
+    m_fd = open(devName, O_RDWR | O_NONBLOCK);
+
+    return m_fd;
+#else
+    return ERROR_NOT_SUPPORT;
+#endif
+}
+
+void 
+SiSTouch_Aegis_Multi_FOR_NEW_DRIVER::waitIOReady(int &fd, int timeoutSec)
+{
+	fd_set rfds;
+	struct timeval tv;
+	int retval;
+
+	FD_ZERO(&rfds); /* clear the set */
+	FD_SET(fd, &rfds); /* add our file descriptor to the set */
+
+	if ( m_verbose )
+	{
+		LOGI("Set timeoutSec: %d(sec)", timeoutSec);
+	}
+
+	tv.tv_sec = timeoutSec;
+	tv.tv_usec = 0;
+
+	retval = select(fd + 1, &rfds, NULL, NULL, &tv);
+
+	if(retval == -1)
+	{
+		perror("select"); /* an error accured */
+	}
+	else if(retval == 0)
+	{
+		if ( m_verbose )
+		{
+			LOGI("IO timeout"); /* a timeout occured */
+		}
+	}
+	else
+	{
+		if ( m_verbose )
+		{
+			LOGI("IO data ready"); /* there was data to read */
+		}
+	}
+}
+
+int
 SiSTouch_Aegis_Multi_FOR_NEW_DRIVER::sis_usb_write( void* data, unsigned int size, int timeout)
 {
     int ret = 0;
@@ -86,6 +149,8 @@ SiSTouch_Aegis_Multi_FOR_NEW_DRIVER::sis_usb_write( void* data, unsigned int siz
 #ifdef VIA_IOCTL
 
 	ret = write(m_fd, buf, size);
+
+	waitIOReady(m_fd, timeout/1000);
 
 #else
 

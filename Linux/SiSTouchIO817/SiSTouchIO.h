@@ -732,9 +732,6 @@ private:
         return AEGIS_I2C_MAX_SIZE;
     }
 
-    
-    virtual int sis_usb_stop();
-
     int simple_io( int cmd, int sleepms = 0, int wTimeout = DEFAULT_TIMEOUT, int rTimeout = DEFAULT_TIMEOUT );
     
     int simple_io_slave( int cmd, int sleepms = 0, int wTimeout = DEFAULT_TIMEOUT, int rTimeout = DEFAULT_TIMEOUT );
@@ -760,6 +757,7 @@ private:
 
 
 protected:
+	virtual int sis_usb_stop();
 
     virtual int sis_usb_start();
 	virtual int sis_usb_write( void* data, unsigned int size, int timeout );
@@ -786,11 +784,13 @@ public:
 	static const char* get_device_name();
 
 private:
+	virtual int sis_usb_stop();
 	virtual int sis_usb_write( void* data, unsigned int size, int timeout );
     virtual int sis_usb_read( void* data, unsigned int size, int timeout );
 	virtual int simple_io_master( int cmd, int sleepms = 0, int wTimeout = DEFAULT_TIMEOUT, int rTimeout = DEFAULT_TIMEOUT );
 
 	bool reFindSisTouchName();
+	void waitIOReady(int &fd, int timeoutSec);
 
 };
 
