@@ -34,7 +34,7 @@ int main( int argc, char** argv )
     {
         int multiNum = SiSTouchAdapter::DEFALUT_SINGLE_NUM;
 
-        multiNum = adapter->doDetectSlaveNum() + 1;
+        multiNum = adapter->doDetectSlaveNum(param.conParameter.m_slaveNumber) + 1;
 
         if (multiNum==SiSTouchAdapter::DEFALUT_SINGLE_NUM) {
             printf("isMulti=0, SlaveNum=0\n");

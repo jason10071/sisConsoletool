@@ -33,7 +33,7 @@ int main( int argc, char** argv )
     if(adapter != 0)
     {
         int multiNum = SiSTouchAdapter::DEFALUT_SINGLE_NUM;
-        multiNum = (!param.jump_check) ? (adapter->doDetectSlaveNum() + 1) : (param.conParameter.multi_Num);
+        multiNum = (!param.jump_check) ? (adapter->doDetectSlaveNum(param.conParameter.m_slaveNumber) + 1) : (param.conParameter.multi_Num);
 
         if(typeid(*adapter) == typeid(AegisMultiSiSTouchAdapter))
         {

@@ -13,7 +13,8 @@ Parameter::Parameter() :
     changeDiagMode (DEFAULT_CHANGE_DIAGMODE),
     changePWRMode  (DEFAULT_CHANGE_PWRMODE),
     
-    m_detectHidrawFlag(DEFAULT_DETECT_HIDRAW_FLAG)
+    m_detectHidrawFlag(DEFAULT_DETECT_HIDRAW_FLAG),
+    m_slaveNumber(AUTO_DETECT_SLAVE_NUMBER)
 {
 
     strcpy( connect, "auto" );
@@ -99,6 +100,11 @@ bool Parameter::parseArgument(char *arg)
     {
         m_detectHidrawFlag = 1;
         printf( "Enable detect hidraw device\n" );
+    }
+	else if ( strstr( arg, "--slaveNum=" ) == arg)
+    {
+        sscanf( arg + 11, "%d", &m_slaveNumber );
+        printf( "Set slaveNumber: %d\n", m_slaveNumber );
     }
     else
     {

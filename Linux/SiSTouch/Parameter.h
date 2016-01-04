@@ -37,6 +37,7 @@ enum
     DEFAULT_CHANGE_PWRMODE = 1,
 
 	DEFAULT_DETECT_HIDRAW_FLAG = 0,
+	AUTO_DETECT_SLAVE_NUMBER = -1,
 };
 
 struct Parameter
@@ -54,6 +55,7 @@ struct Parameter
     char devName[MAX_DEVNAME_LENGTH];
 
 	int m_detectHidrawFlag;
+	int m_slaveNumber;
 
 
     Parameter();

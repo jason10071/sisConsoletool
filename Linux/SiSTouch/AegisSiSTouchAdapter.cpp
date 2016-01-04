@@ -3537,8 +3537,14 @@ AegisMultiSiSTouchAdapter::doDetectIsMulti()
 }
 
 int
-AegisMultiSiSTouchAdapter::doDetectSlaveNum()
+AegisMultiSiSTouchAdapter::doDetectSlaveNum(int slaveNumber)
 {
+	if(slaveNumber >= 0)
+	{
+		printf("user define slaveNum=%d\n", slaveNumber);
+		return slaveNumber;
+	}
+	
     int oldSlaveAddr = ((SiSTouch_Aegis_Multi*)m_io)->getSlaveAddr();
 
     int slaveNum = DEFALUT_SLAVE_NUM;
