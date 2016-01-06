@@ -3542,6 +3542,7 @@ AegisMultiSiSTouchAdapter::doDetectSlaveNum(int slaveNumber)
 	if(slaveNumber >= 0)
 	{
 		printf("user define slaveNum=%d\n", slaveNumber);
+		m_io->setChipNum(slaveNumber + 1);
 		return slaveNumber;
 	}
 	

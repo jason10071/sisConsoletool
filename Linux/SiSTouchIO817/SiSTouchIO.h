@@ -639,6 +639,7 @@ public:
     enum
     {
         DEFAULT_TIMEOUT = 1000,
+		CMD81_TIMEOUT = 3000,
     };
 
     SiSTouch_Aegis_Multi ( int max_retry, int delay, int verbose, int ioDelay, int changeDiagMode, int changePWRMode)
@@ -731,15 +732,11 @@ private:
     {
         return AEGIS_I2C_MAX_SIZE;
     }
-
-    int simple_io( int cmd, int sleepms = 0, int wTimeout = DEFAULT_TIMEOUT, int rTimeout = DEFAULT_TIMEOUT );
     
     int simple_io_slave( int cmd, int sleepms = 0, int wTimeout = DEFAULT_TIMEOUT, int rTimeout = DEFAULT_TIMEOUT );
-    int io_command( unsigned char * buf, int size, int sleepms = 0, int wTimeout = DEFAULT_TIMEOUT, int rTimeout = DEFAULT_TIMEOUT );
 
     void make_common_header( int cmd, int length );
     void generate_output_crc();
-    int read_simple_ack(int size);
 
     void make_common_header_master( int cmd, int length );
     void generate_output_crc_master();
@@ -757,6 +754,9 @@ private:
 
 
 protected:
+	int simple_io( int cmd, int sleepms = 0, int wTimeout = DEFAULT_TIMEOUT, int rTimeout = DEFAULT_TIMEOUT );
+	int io_command( unsigned char * buf, int size, int sleepms = 0, int wTimeout = DEFAULT_TIMEOUT, int rTimeout = DEFAULT_TIMEOUT );
+	
 	virtual int sis_usb_stop();
 
     virtual int sis_usb_start();
@@ -764,6 +764,7 @@ protected:
     virtual int sis_usb_read( void* data, unsigned int size, int timeout );
 	virtual int simple_io_master( int cmd, int sleepms = 0, int wTimeout = DEFAULT_TIMEOUT, int rTimeout = DEFAULT_TIMEOUT );
 	int read_simple_ack_master(int size);
+	int read_simple_ack(int size);
 
 };
 
@@ -777,8 +778,10 @@ public:
     {
     }
 
+	virtual int call_04();
     virtual int call_82();
     virtual int call_82_without_retry();
+	virtual int call_85( int data );
     virtual int call_87();
 
 	static const char* get_device_name();

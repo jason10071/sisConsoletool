@@ -39,7 +39,7 @@
 #ifdef DIAGNOSIS_MODE
 #define ENABLE_DIAGNOSIS_MODE 0x00000121
 #define DISABLE_DIAGNOSIS_MODE 0x00000120
-#define DELAY_FOR_DIAGNOSIS_MODE_CHANGE 1000
+#define DELAY_FOR_DIAGNOSIS_MODE_CHANGE 500 //1000
 #endif
 
 #define PWR_MODE
@@ -251,6 +251,66 @@ bool SiSTouch_Aegis_Multi_FOR_NEW_DRIVER::reFindSisTouchName()
 }
 
 int
+SiSTouch_Aegis_Multi_FOR_NEW_DRIVER::call_04()
+{
+    if( m_verbose)
+    {
+        LOGI("call_04()");
+    }
+
+    int flag = 0;
+    int ret;
+    for( int i = 0; i < m_retry; i++ )
+    {
+        //0x81 need delay between read and write
+
+        //ret = simple_io( 0x81, DELAY_FOR_81 );
+        ret = simple_io( 0x81, DELAY_FOR_GENEARL, CMD81_TIMEOUT);
+
+        if ( ret < 0 )
+        {
+            ret = parse_syscall_return_value( ret, GENERAL_TYPE_FLAG );
+            if(is_noneed_retry_error(ret))
+            {
+                break;
+            }
+        }
+        else
+        {
+
+            ret = read_simple_ack(ret);
+
+            if ( ret == 0 )
+                flag = 1;
+
+            if ( ret != ERROR_NACK )
+                break;
+        }
+
+        usleep( m_delay );
+    }
+
+    if ( !flag )
+    {
+        if ( ret == ERROR_NACK )
+            ret = ERROR_TIMEOUT;
+
+        if ( m_verbose )
+            LOGE( "ERROR: 81 command not ACK, give up" );
+    }
+
+    if( ret < 0 )
+    {
+        if ( m_verbose )
+        {
+            log_out_error_message( ret, 0x04 );
+        }
+    }
+    return ret;
+
+}
+
+int
 SiSTouch_Aegis_Multi_FOR_NEW_DRIVER::call_82()
 {
 
@@ -389,6 +449,68 @@ SiSTouch_Aegis_Multi_FOR_NEW_DRIVER::call_82_without_retry()
     return ret;
 
 }
+
+int
+SiSTouch_Aegis_Multi_FOR_NEW_DRIVER::call_85(int data )
+{
+
+    int ret = 0;
+
+    if( m_verbose)
+    {
+        LOGI("call_85()");
+        LOGI(" data=%08x", data);
+    }
+
+    for( int i = 0; i < m_retry; i++)
+    {
+
+        int len = make_85_buffer( data );
+
+        ret = io_command( m_buffer, len, DELAY_FOR_GENEARL );
+
+        if ( ret < 0 )
+        {
+            ret = parse_syscall_return_value( ret, GENERAL_TYPE_FLAG );
+            break;
+        }
+        else
+        {
+            ret = read_simple_ack_master(ret);
+            break;
+        }
+
+        usleep( m_delay );
+    }
+
+    if( ret < 0 )
+    {
+        if ( m_verbose )
+        {
+            log_out_error_message( ret, 0x85 );
+        }
+    }
+#ifdef DIAGNOSIS_MODE
+    else
+    {
+    	// just waitIOReady 
+    	// single chip: change done if ack-beef -> dont need wait
+    	// slave chip need polling -> wait
+		if(this->m_chipNum > 1)
+		{
+			if(data == DISABLE_DIAGNOSIS_MODE || data == ENABLE_DIAGNOSIS_MODE)
+        	{
+        		if ( m_verbose ) printf("DELAY_FOR_DIAGNOSIS_MODE_CHANGE=%d\n", DELAY_FOR_DIAGNOSIS_MODE_CHANGE);
+            	usleep(DELAY_FOR_DIAGNOSIS_MODE_CHANGE * 1000);
+        	}
+		} 
+    }
+#endif
+
+    return ret;
+
+}
+
 
 int
 SiSTouch_Aegis_Multi_FOR_NEW_DRIVER::call_87()
