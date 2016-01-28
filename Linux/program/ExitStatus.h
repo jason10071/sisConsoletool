@@ -7,4 +7,7 @@
 #define EXIT_BADARGU       34            /* Error input argument */
 #define EXIT_NODEV         35            /* Device not found */
 
+#define EXIT_ACTIVE_AHEAD          36            /* the active firmware id is AHEAD */
+#define EXIT_ACTIVE_BEHEAD         37            /* the active firmware id is BEHEAD */
+
 #endif

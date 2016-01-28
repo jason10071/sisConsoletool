@@ -100,12 +100,22 @@ int main( int argc, char** argv )
                         }
 
                         ((AegisMultiSiSTouchAdapter*)adapter)->setSlaveAddr(AegisMultiSiSTouchAdapter::getStaticSlaveAddr(i));
-                        ret = adapter->doCompareId(multi_input_files[i]);
+                        ret = adapter->doCompareId(multi_input_files[i], true);
 
                         if(ret == SiSTouchAdapter::RESULT_SAME)
                         {
                             exitValue |= EXIT_OK;
                             printf("the firmware id is the same\n");
+                        }
+						else if(ret == SiSTouchAdapter::RESULT_ACTIVE_AHEAD)
+                        {
+                            exitValue = EXIT_ACTIVE_AHEAD;
+                            printf("the active firmware id is AHEAD\n");
+                        }
+						else if(ret == SiSTouchAdapter::RESULT_ACTIVE_BEHEAD)
+                        {
+                            exitValue = EXIT_ACTIVE_BEHEAD;
+                            printf("the active firmware id is BEHEAD\n");
                         }
                         else if(ret == SiSTouchAdapter::RESULT_DIFFERENT)
                         {

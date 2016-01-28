@@ -220,7 +220,7 @@ long SiSTouchAdapter::getFileLength(FILE* file)
     return file_length;
 }
 
-int SiSTouchAdapter::doCompareId(FILE* file)
+int SiSTouchAdapter::doCompareId(FILE* file, bool checkAheadOrBehind)
 {
     int device_firmware_id[FIRMWARE_ID_LENGTH] = {0};
     int file_firmware_id[FIRMWARE_ID_LENGTH] = {0};
@@ -237,7 +237,20 @@ int SiSTouchAdapter::doCompareId(FILE* file)
         return ERROR_FAIL_GET_DEVICE_ID;
     }
 
-    bool result = compareId(file_firmware_id, device_firmware_id, FIRMWARE_ID_LENGTH);
+	bool result = false;
+
+	if(!checkAheadOrBehind)
+	{
+		bool result = compareId(file_firmware_id, device_firmware_id, FIRMWARE_ID_LENGTH);
+	}
+	else
+	{
+		return compareFirmwareID( (file_firmware_id[FIRMWARE_ID_LENGTH - 1] ) & 0xff, 
+									(file_firmware_id[FIRMWARE_ID_LENGTH - 1] >> 8) & 0x0f,
+									(device_firmware_id[FIRMWARE_ID_LENGTH - 1] ) & 0xff, 
+									(device_firmware_id[FIRMWARE_ID_LENGTH - 1] >> 8) & 0x0f 
+								);
+	}
 
     return result ? RESULT_SAME : RESULT_DIFFERENT;
 }
@@ -287,6 +300,38 @@ bool SiSTouchAdapter::compareId(int* idA, int* idB, int length)
     return true;
 
 }
+
+int
+SiSTouchAdapter::compareFirmwareID( int fileMajorId, int fileMinorId, int deviceMajorId, int deviceMinorId )
+{
+	printf("file Firmware ID (0xc00f): v%02x.%01x\n", fileMajorId, fileMinorId );
+	printf("device Firmware ID (0xc00f): v%02x.%01x\n", deviceMajorId, deviceMinorId );
+
+	if( fileMajorId > deviceMajorId )
+	{
+		return SiSTouchAdapter::RESULT_ACTIVE_BEHEAD;
+	}
+	else if( fileMajorId < deviceMajorId )
+	{
+		return SiSTouchAdapter::RESULT_ACTIVE_AHEAD;
+	}
+	else
+	{
+		if( fileMinorId > deviceMinorId)
+		{
+			return SiSTouchAdapter::RESULT_ACTIVE_BEHEAD;
+		}
+		else if( fileMinorId < deviceMinorId)
+		{
+			return SiSTouchAdapter::RESULT_ACTIVE_AHEAD;
+		}
+		else
+		{
+			return SiSTouchAdapter::RESULT_SAME;
+		}
+	}
+}
+
 
 int SiSTouchAdapter::doCheckCalibrationFlag()
 {

@@ -29,6 +29,8 @@ public:
         SUCCESS = 1,
         RESULT_SAME = 1,
         RESULT_DIFFERENT = 0,
+        RESULT_ACTIVE_AHEAD = 36,
+        RESULT_ACTIVE_BEHEAD = 37,
         ERROR_FAIL_GET_INPUT_ID = -256,
         ERROR_FAIL_GET_DEVICE_ID = -257,
         ERROR_FAIL_GET_FILE_ID = -258,
@@ -86,7 +88,7 @@ public:
 
 	int doUpdateCalibrationData(OpenShortData* data);
     int doUpdate( FILE* file, bool update_bootloader, bool update_bootloader_auto, bool reserve_RODATA, bool update_parameter, bool force_update, bool jump_check);
-    int doCompareId(FILE* file);
+    int doCompareId(FILE* file, bool checkAheadOrBehind = false );
     int doCompareId(char* input);
     int showDeviceId();
 	int doReset(int time, bool noquery);
@@ -194,6 +196,7 @@ protected:
 
 
     bool compareId( int* idA, int* idB, int length );
+	int compareFirmwareID( int fileMajorId, int fileMinorId, int deviceMajorId, int deviceMinorId );
     bool checkFileBufIsValid( int file_length, int* buf, int buf_length );
 
     virtual int get_READ_LENGTH() = 0;
