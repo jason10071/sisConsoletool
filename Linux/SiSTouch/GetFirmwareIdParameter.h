@@ -26,6 +26,10 @@ class GetFirmwareIdParameter : public ApplicationParameter
         char slave_filenames[MAX_SLAVE_NUM][MAX_FILENAME_LENGTH];
         char input[MAX_FILENAME_LENGTH];
         char slave_input[MAX_SLAVE_NUM][MAX_FILENAME_LENGTH];
+
+		bool fromVer;
+		int ver_major;
+		int ver_minor;
 }; /* end of class GetFirmwareIdParameter */
 
 #endif

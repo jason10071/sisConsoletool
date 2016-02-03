@@ -245,7 +245,7 @@ int SiSTouchAdapter::doCompareId(FILE* file, bool checkAheadOrBehind)
 	}
 	else
 	{
-		return compareFirmwareID( (file_firmware_id[FIRMWARE_ID_LENGTH - 1] ) & 0xff, 
+		return compareFirmwareVersion( (file_firmware_id[FIRMWARE_ID_LENGTH - 1] ) & 0xff, 
 									(file_firmware_id[FIRMWARE_ID_LENGTH - 1] >> 8) & 0x0f,
 									(device_firmware_id[FIRMWARE_ID_LENGTH - 1] ) & 0xff, 
 									(device_firmware_id[FIRMWARE_ID_LENGTH - 1] >> 8) & 0x0f 
@@ -253,6 +253,26 @@ int SiSTouchAdapter::doCompareId(FILE* file, bool checkAheadOrBehind)
 	}
 
     return result ? RESULT_SAME : RESULT_DIFFERENT;
+}
+
+int 
+SiSTouchAdapter::doCompareId( int major, int minor )
+{
+    int device_firmware_id[FIRMWARE_ID_LENGTH] = {0};
+
+    int getDeviceIdResult = getDeviceId(device_firmware_id, FIRMWARE_ID_LENGTH);
+
+    if(getDeviceIdResult != SUCCESS && getDeviceIdResult != ERROR_START_DRIVER )
+    {
+        return ERROR_FAIL_GET_DEVICE_ID;
+    }
+
+	return compareFirmwareVersion( major, 
+							  minor,
+							  (device_firmware_id[FIRMWARE_ID_LENGTH - 1] ) & 0xff, 
+							  (device_firmware_id[FIRMWARE_ID_LENGTH - 1] >> 8) & 0x0f 
+							);
+
 }
 
 int SiSTouchAdapter::doCompareId(char* input)
@@ -285,6 +305,11 @@ int SiSTouchAdapter::showDeviceId()
         return ERROR_FAIL_GET_DEVICE_ID;
     }
 
+    int deviceMajorId = ( device_firmware_id[FIRMWARE_ID_LENGTH - 1] ) & 0xff;
+	int deviceMinorId = ( device_firmware_id[FIRMWARE_ID_LENGTH - 1] >> 8) & 0x0f;
+	
+	printf("Active Firmware Version (0xc00f): %d.%d\n", deviceMajorId, deviceMinorId );
+
     return SUCCESS;
 }
 
@@ -302,10 +327,10 @@ bool SiSTouchAdapter::compareId(int* idA, int* idB, int length)
 }
 
 int
-SiSTouchAdapter::compareFirmwareID( int fileMajorId, int fileMinorId, int deviceMajorId, int deviceMinorId )
+SiSTouchAdapter::compareFirmwareVersion( int fileMajorId, int fileMinorId, int deviceMajorId, int deviceMinorId )
 {
-	printf("file Firmware ID (0xc00f): v%02x.%01x\n", fileMajorId, fileMinorId );
-	printf("device Firmware ID (0xc00f): v%02x.%01x\n", deviceMajorId, deviceMinorId );
+	printf("Input/File Firmware Version (0xc00f): %d.%d\n", fileMajorId, fileMinorId );
+	printf("Active Firmware Version (0xc00f): %d.%d\n", deviceMajorId, deviceMinorId );
 
 	if( fileMajorId > deviceMajorId )
 	{

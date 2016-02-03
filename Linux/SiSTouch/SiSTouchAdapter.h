@@ -89,6 +89,7 @@ public:
 	int doUpdateCalibrationData(OpenShortData* data);
     int doUpdate( FILE* file, bool update_bootloader, bool update_bootloader_auto, bool reserve_RODATA, bool update_parameter, bool force_update, bool jump_check);
     int doCompareId(FILE* file, bool checkAheadOrBehind = false );
+	int doCompareId( int major, int minor );
     int doCompareId(char* input);
     int showDeviceId();
 	int doReset(int time, bool noquery);
@@ -196,7 +197,7 @@ protected:
 
 
     bool compareId( int* idA, int* idB, int length );
-	int compareFirmwareID( int fileMajorId, int fileMinorId, int deviceMajorId, int deviceMinorId );
+	int compareFirmwareVersion( int fileMajorId, int fileMinorId, int deviceMajorId, int deviceMinorId );
     bool checkFileBufIsValid( int file_length, int* buf, int buf_length );
 
     virtual int get_READ_LENGTH() = 0;

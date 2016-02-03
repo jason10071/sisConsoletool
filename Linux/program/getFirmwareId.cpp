@@ -105,22 +105,22 @@ int main( int argc, char** argv )
                         if(ret == SiSTouchAdapter::RESULT_SAME)
                         {
                             exitValue |= EXIT_OK;
-                            printf("the firmware id is the same\n");
+                            printf("the firmware Version is the same\n");
                         }
 						else if(ret == SiSTouchAdapter::RESULT_ACTIVE_AHEAD)
                         {
                             exitValue = EXIT_ACTIVE_AHEAD;
-                            printf("the active firmware id is AHEAD\n");
+                            printf("the active firmware Version is AHEAD\n");
                         }
 						else if(ret == SiSTouchAdapter::RESULT_ACTIVE_BEHEAD)
                         {
                             exitValue = EXIT_ACTIVE_BEHEAD;
-                            printf("the active firmware id is BEHEAD\n");
+                            printf("the active firmware Version is BEHEAD\n");
                         }
                         else if(ret == SiSTouchAdapter::RESULT_DIFFERENT)
                         {
                             exitValue = EXIT_FAIL;
-                            printf("the firmware id is different\n");
+                            printf("the firmware Version is different\n");
                         }
                         else
                         {
@@ -139,6 +139,58 @@ int main( int argc, char** argv )
                 }
 
             }
+
+			else if(param.fromVer)
+            {
+                if(false)
+                {
+                }
+                else
+                {
+                    for(int i = 0; i < multiNum; i++)
+                    {
+                        if(i == 0)
+                        {
+                            printf("master:\n");
+                        }
+                        else
+                        {
+                            printf("slave %d:\n", (i-1));
+                        }
+
+                        ((AegisMultiSiSTouchAdapter*)adapter)->setSlaveAddr(AegisMultiSiSTouchAdapter::getStaticSlaveAddr(i));
+                        ret = adapter->doCompareId(param.ver_major, param.ver_minor);
+
+						if(ret == SiSTouchAdapter::RESULT_SAME)
+						{
+							exitValue |= EXIT_OK;
+							printf("the firmware Version is the same\n");
+						}
+						else if(ret == SiSTouchAdapter::RESULT_ACTIVE_AHEAD)
+						 {
+							exitValue = EXIT_ACTIVE_AHEAD;
+							printf("the active firmware Version is AHEAD\n");
+						}
+						else if(ret == SiSTouchAdapter::RESULT_ACTIVE_BEHEAD)
+						{
+							exitValue = EXIT_ACTIVE_BEHEAD;
+							printf("the active firmware Version is BEHEAD\n");
+						}
+						else if(ret == SiSTouchAdapter::RESULT_DIFFERENT)
+						{
+							exitValue = EXIT_FAIL;
+							printf("the firmware Version is different\n");
+						}
+						else
+						{
+							exitValue = EXIT_ERR;
+							printf("some error occurs, please check the output. Err = %d.\n", ret);
+							break;
+						}
+                    }
+                }
+            }
+						
             else if(param.fromInput)
             {
                 if(multiNum != param.conParameter.multi_Num)

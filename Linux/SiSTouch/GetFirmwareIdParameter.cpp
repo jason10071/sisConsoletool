@@ -2,7 +2,12 @@
 
 
 /*===========================================================================*/
-GetFirmwareIdParameter::GetFirmwareIdParameter() : fromFile(false) ,fromInput(false)
+GetFirmwareIdParameter::GetFirmwareIdParameter() : 
+	fromFile(false),
+	fromInput(false),
+	fromVer(false),
+	ver_major(0),
+	ver_minor(0)
 {
     strcpy( input, "" );
     strcpy( slave_input[0], "" );
@@ -201,6 +206,36 @@ bool GetFirmwareIdParameter::parseArgument(char *arg)
             conParameter.multi_Num = 7;
         }
     }
+	else if( strstr( arg, "--ver=" ) == arg )
+	{
+		char tmpVer[512];
+		strcpy( tmpVer, arg + 6 );
+
+		char* major = strtok(tmpVer, ".");
+		if( major != NULL )
+		{
+			sscanf( major, "%d", &ver_major );
+		}
+		else
+		{
+			printf( "error: parse ver\n" );
+			return false;
+		}
+
+		char* minor = strtok(NULL, ".");
+		if( minor != NULL )
+		{
+			sscanf( minor, "%d", &ver_minor );
+		}
+		else
+		{
+			printf( "error: parse ver\n" );
+			return false;
+		}
+		
+		printf( "Set ver: %d.%d\n", ver_major, ver_minor );
+		fromVer = true;
+	}
     else
     {
         printf( "unknown parameter\n" );
