@@ -7,7 +7,7 @@
 #include "OpenShortConfig.h"
 #include "Parameter.h"
 
-#define SLEEP_RETRY 100
+#define SLEEP_RETRY 3 // 100
 #define SLEEP_RETRY_TIME (50 * 1000)
 //1s
 #define QUERY_CALIBRATION_SLEEP_TIME (1000 * 1000)

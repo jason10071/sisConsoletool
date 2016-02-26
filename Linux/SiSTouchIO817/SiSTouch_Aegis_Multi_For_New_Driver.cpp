@@ -525,7 +525,7 @@ SiSTouch_Aegis_Multi_FOR_NEW_DRIVER::call_87()
 
     for( int i = 0; i < m_retry; i++)
     {
-        ret = simple_io_master( 0x87, DELAY_FOR_GENEARL , DEFAULT_TIMEOUT, TIMEOUT_FOR_87 );
+        ret = simple_io_master( 0x87, DELAY_FOR_GENEARL , TIMEOUT_FOR_87, TIMEOUT_FOR_87 );
 		
         // [20150304]
         if(this->m_chipNum >= 7)
