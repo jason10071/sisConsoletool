@@ -414,6 +414,7 @@ public:
     static int getStaticSlaveAddr(int idx);
 
     virtual bool doDetectIsMulti();
+	virtual bool checkCalibrationNeeded();
     virtual int doDetectSlaveNum(int slaveNumber);
 
     static bool ioStaticDetectIsMulti(int max_retry, int retryDelay, int verbose, int ioDelay, int changeDiagMode, int changePWRMode);

@@ -1371,6 +1371,12 @@ bool SiSTouchAdapter::doDetectIsMulti()
     return false;
 }
 
+bool
+SiSTouchAdapter::checkCalibrationNeeded()
+{
+	return false;
+}
+
 int SiSTouchAdapter::doDetectSlaveNum(int slaveNumber)
 {
     return 0;

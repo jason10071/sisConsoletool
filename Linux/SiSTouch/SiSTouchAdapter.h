@@ -104,6 +104,7 @@ public:
     int doOpenShort(OpenShortData* deviceData, OpenShortData* sampleData, OpenShortConfig* config, OpenShortResult *result, bool bCheckSecondThreshold = false);
     int doCheckFWState();
     virtual bool doDetectIsMulti();
+	virtual bool checkCalibrationNeeded();
     virtual int doDetectSlaveNum(int slaveNumber);
     int doDumpROM(int *buf);
     int doSoftReset();

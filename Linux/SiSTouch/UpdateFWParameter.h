@@ -26,6 +26,8 @@ class UpdateFWParameter : public ApplicationParameter
         bool force_update;
         bool jump_check;
         int  wait_time;
+
+		bool  m_calibrationOnly;
 }; /* end of class UpdateFWParameter */
 /*===========================================================================*/
 

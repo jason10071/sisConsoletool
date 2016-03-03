@@ -3536,6 +3536,56 @@ AegisMultiSiSTouchAdapter::doDetectIsMulti()
     return isMultiDevice;
 }
 
+bool
+AegisMultiSiSTouchAdapter::checkCalibrationNeeded()
+{
+    int oldSlaveAddr = ((SiSTouch_Aegis_Multi*)m_io)->getSlaveAddr();
+
+    bool calibrationNeeded = false;
+    int ret = 0;
+    bool result = false;
+
+    ((SiSTouch_Aegis_Multi*)m_io)->setSlaveAddr( MASTER_DEVICE_ADDR );
+
+    ret = m_io->stop_driver();
+    if( ret < 0 )
+    {
+        ((SiSTouch_Aegis_Multi*)m_io)->setSlaveAddr( oldSlaveAddr );
+        printf("[SiSTouch][AegisMultiSiSTouchAdapter::checkCalibrationNeeded] stop_driver fail");
+        return calibrationNeeded;
+    }
+
+    int data[3] = {0};
+
+    result = read_from_address(INTERFACE_FLAG_ADDR, data, 3);
+
+    if( result )
+    {
+        bool isMultiDevice = false;
+
+		/* c02c c02d c02e c02f */
+        unsigned int c02cInt = invert_endian(data[2]);
+
+		/* get c02c */
+        int c02cByte = (c02cInt >> 24) & 0xff;
+
+		//printf("c02cInt=0x%08x\n", c02cInt);
+		//printf("c02cByte=0x%02x\n", c02cByte);
+
+		/* needed calibration if 0x01 */
+        if ( c02cByte == 0x01 )
+        {
+            calibrationNeeded = true;
+        }
+    }
+
+    m_io->start_driver();
+
+    ((SiSTouch_Aegis_Multi*)m_io)->setSlaveAddr( oldSlaveAddr );
+
+    return calibrationNeeded;
+}
+
 int
 AegisMultiSiSTouchAdapter::doDetectSlaveNum(int slaveNumber)
 {

@@ -10,4 +10,8 @@
 #define EXIT_ACTIVE_AHEAD          36            /* the active firmware id is AHEAD */
 #define EXIT_ACTIVE_BEHEAD         37            /* the active firmware id is BEHEAD */
 
+#define EXIT_UPDATE_FW_WITH_CALIBRATION_OK          40            /*  UPDATE_FW_WITH_CALIBRATION_OK */
+#define EXIT_UPDATE_FW_WITH_CALIBRATION_ERR         41            /*  UPDATE_FW_WITH_CALIBRATION_ERR */
+
+
 #endif

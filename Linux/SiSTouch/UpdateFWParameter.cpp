@@ -126,7 +126,8 @@ UpdateFWParameter::UpdateFWParameter() :
     update_parameter(false),
     force_update(false),
     jump_check(false),
-    wait_time(10)
+    wait_time(10),
+    m_calibrationOnly(false)
 {
     this->filenames.clear();
 }
@@ -202,6 +203,11 @@ bool UpdateFWParameter::parseArgument(char *arg)
         wait_time = atoi(arg + 3);
         printf( "wait time set: %d\n", wait_time);
     }
+	else if ( strcmp( arg, "--calibration-only" ) == 0 )
+    {
+        m_calibrationOnly = true;
+        printf( "Set Calibration Only\n");
+    }
     else
     {
         filenames.push_back(arg);
@@ -231,6 +237,11 @@ int UpdateFWParameter::check()
         return 0;
     }
 
+	if(m_calibrationOnly == true)
+	{
+		return 1; // calibration only
+	}
+		
     int bin_files_num = this->filenames.size();
 
     if (bin_files_num==0) {
