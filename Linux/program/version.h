@@ -3,7 +3,7 @@
 
 #define MAIN_VERSION 1
 #define SUB_VERSION 8
-#define LAST_VERSION 38 // base on 1.8.20
+#define LAST_VERSION 39 // base on 1.8.20
 #define DESC "HIDRAW"
 
 void printVersion()

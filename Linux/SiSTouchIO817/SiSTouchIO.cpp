@@ -445,21 +445,21 @@ SiSTouchIO::getActiveDeviceName()
 int
 SiSTouchIO::getDeviceType(int max_retry, int retry_delay, int verbose, int ioDelay, int changeDiagMode, int changePWRMode)
 {
-    return getDeviceType(max_retry, retry_delay, verbose, ioDelay, changeDiagMode, changePWRMode, 0);
+    return getDeviceType(max_retry, retry_delay, verbose, ioDelay, changeDiagMode, changePWRMode, 0, 0);
 }
 
 int
-SiSTouchIO::getDeviceType(int max_retry, int retry_delay, int verbose, int ioDelay, int changeDiagMode, int changePWRMode, int detectHidrawFlag)
+SiSTouchIO::getDeviceType(int max_retry, int retry_delay, int verbose, int ioDelay, int changeDiagMode, int changePWRMode, int detectHidrawFlag, int detectI2cFlag)
 {
 	int con = SiSTouchIO::CON_NONE;
 
-	if(detectHidrawFlag == 1)
+	/* new driver */
+	if(detectHidrawFlag == 1 || detectI2cFlag == 1)
 	{
-        // only detect hidraw
 		if( strlen(m_activeDeviceName) == 0 )
 		{
 		    SisTouchFinder sisTouchFinder;
-        	const char* deviceName = sisTouchFinder.autoDetectDevicePath();
+        	const char* deviceName = sisTouchFinder.autoDetectDevicePath(detectHidrawFlag, detectI2cFlag);
 	
         	if(deviceName != 0)
         	{
@@ -470,6 +470,10 @@ SiSTouchIO::getDeviceType(int max_retry, int retry_delay, int verbose, int ioDel
 				else if(sisTouchFinder.getDeviceType() == SisTouchFinder::I2C_817)
 				{
 			    	con = CON_AEGIS_I2C_FOR_NEW_DRIVER;
+				}
+				else if(sisTouchFinder.getDeviceType() == SisTouchFinder::HID_OVER_I2C_817)
+				{
+			    	con = CON_AEGIS_HID_OVER_I2C;
 				}
 
             	strcpy(m_activeDeviceName, deviceName);
@@ -482,16 +486,22 @@ SiSTouchIO::getDeviceType(int max_retry, int retry_delay, int verbose, int ioDel
 		}
 		else
 		{
-            SisTouchFinder sisTouchFinder;
-            if( !sisTouchFinder.isSisTouchHid(m_activeDeviceName) )
-			{
-			    printf("activeDeviceName=%s is not sis touch, ", m_activeDeviceName);
-                return con;
-			}
-			
 			if( strstr( m_activeDeviceName, "/dev/hidraw" ) == m_activeDeviceName )
         	{
-                con = CON_AEGIS_MULTI_FOR_NEW_DRIVER;
+        		SisTouchFinder sisTouchFinder;
+				bool ret = sisTouchFinder.isSisTouchHid(m_activeDeviceName);
+
+				if(ret)
+				{
+					if(sisTouchFinder.getDeviceType() == SisTouchFinder::USB_817)
+            		{
+                		con = CON_AEGIS_MULTI_FOR_NEW_DRIVER;
+            		}
+					else if(sisTouchFinder.getDeviceType() == SisTouchFinder::HID_OVER_I2C_817)
+					{
+			    		con = CON_AEGIS_HID_OVER_I2C;
+					}
+				}
             }
 			else if( strstr( m_activeDeviceName, "/dev/i2c" ) == m_activeDeviceName)
 			{
@@ -501,6 +511,7 @@ SiSTouchIO::getDeviceType(int max_retry, int retry_delay, int verbose, int ioDel
 			printf("activeDeviceName=%s, ", m_activeDeviceName);
             return con;
 		}
+		
     }
 
 	return con;

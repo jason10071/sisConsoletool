@@ -377,6 +377,31 @@ AegisI2CSiSTouchAdapter::isSiSFWFile(int* buf, int buf_length)
 }
 
 int
+AegisHidOverI2CSiSTouchAdapter::isSiSFWFile(int* buf, int buf_length)
+{
+    int ret = AegisSiSTouchAdapter::isSiSFWFile(buf, buf_length);
+    if(ret)
+    {
+        unsigned int interfaceData = invert_endian(buf[INTERFACE_FLAG_BASE / sizeof(int)]);
+        unsigned int interfaceId = (interfaceData >> INTERFACE_SHIFT) & INTERFACE_MASK;
+        unsigned int multichip_Selective_ChipId = (interfaceData >> MULTI_SHIFT) & MULTI_MASK;
+
+        if(interfaceId != I2C_INTERFACE || multichip_Selective_ChipId != NON_MULTI_DEVICE_FLAG)
+        {
+            printf("interface not match. interface : %02x, multi_select : %02x\n", interfaceId, multichip_Selective_ChipId);
+            ret = 0;
+        }
+        else
+        {
+            ret = 1;
+        }
+    }
+
+    return ret;
+}
+
+
+int
 AegisUSBSiSTouchAdapter::isSiSFWFile(int* buf, int buf_length)
 {
     int ret = AegisSiSTouchAdapter::isSiSFWFile(buf, buf_length);
@@ -3231,6 +3256,50 @@ AegisSiSTouchAdapter::getAbsDiffPercentage(float numerator, float denominator)
     }
 }
 
+bool
+AegisSiSTouchAdapter::checkCalibrationNeeded()
+{
+    bool calibrationNeeded = false;
+    int ret = 0;
+    bool result = false;
+
+    ret = m_io->stop_driver();
+    if( ret < 0 )
+    {
+        printf("[SiSTouch][AegisSiSTouchAdapter::checkCalibrationNeeded] stop_driver fail");
+        return calibrationNeeded;
+    }
+
+    int data[3] = {0};
+
+    result = read_from_address(INTERFACE_FLAG_ADDR, data, 3);
+
+    if( result )
+    {
+        bool isMultiDevice = false;
+
+		/* c02c c02d c02e c02f */
+        unsigned int c02cInt = invert_endian(data[2]);
+
+		/* get c02c */
+        int c02cByte = (c02cInt >> 24) & 0xff;
+
+		//printf("AegisSiSTouchAdapter, c02cInt=0x%08x\n", c02cInt);
+		printf("AegisSiSTouchAdapter, c02cByte=0x%02x\n", c02cByte);
+
+		/* needed calibration if 0x01 */
+        if ( c02cByte == 0x01 )
+        {
+            calibrationNeeded = true;
+        }
+    }
+
+    m_io->start_driver();
+
+    return calibrationNeeded;
+
+}
+
 int
 AegisSiSTouchAdapter::parameterCheck(bool& update_bootloader, bool& update_bootloader_auto, bool &isNewBootloader, bool& reserve_RODATA, bool &update_parameter, bool force_update, int *buf, int file_Length)
 {
@@ -3569,8 +3638,8 @@ AegisMultiSiSTouchAdapter::checkCalibrationNeeded()
 		/* get c02c */
         int c02cByte = (c02cInt >> 24) & 0xff;
 
-		//printf("c02cInt=0x%08x\n", c02cInt);
-		//printf("c02cByte=0x%02x\n", c02cByte);
+		//printf("AegisMultiSiSTouchAdapter, c02cInt=0x%08x\n", c02cInt);
+		printf("AegisMultiSiSTouchAdapter, c02cByte=0x%02x\n", c02cByte);
 
 		/* needed calibration if 0x01 */
         if ( c02cByte == 0x01 )

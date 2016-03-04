@@ -233,7 +233,7 @@ SiSTouch_Aegis_Multi_FOR_NEW_DRIVER::simple_io_master( int cmd, int sleepms, int
 bool SiSTouch_Aegis_Multi_FOR_NEW_DRIVER::reFindSisTouchName()
 {
 	SisTouchFinder sisTouchFinder;
-	const char* deviceName = sisTouchFinder.autoDetectDevicePath();
+	const char* deviceName = sisTouchFinder.autoDetectDevicePath(1, 0);
 	
 	if(deviceName != 0)
 	{

@@ -35,7 +35,7 @@ int main( int argc, char** argv )
         int multiNum = SiSTouchAdapter::DEFALUT_SINGLE_NUM;
         multiNum = (!param.jump_check) ? (adapter->doDetectSlaveNum(param.conParameter.m_slaveNumber) + 1) : (param.conParameter.multi_Num);
 
-		if(typeid(*adapter) == typeid(AegisMultiSiSTouchAdapter) && param.m_calibrationOnly == true)
+		if(param.m_calibrationOnly == true)
 		{
 			/* re-calibration only */
 			printf("Calibration only\n");
@@ -205,6 +205,32 @@ int main( int argc, char** argv )
             {
                 exitValue = EXIT_OK;
                 printf( "update firmware finished.\n" );
+
+				/* re-calibration after update finished */
+				if( exitValue == EXIT_OK && adapter->checkCalibrationNeeded() )
+				{
+					printf("Needed calibration.\n");
+					int time = 5;
+					bool noquery = false;
+					ret = adapter->doCalibraion(time, noquery);
+
+					if(ret == SiSTouchAdapter::SUCCESS)
+					{
+						exitValue = EXIT_UPDATE_FW_WITH_CALIBRATION_OK;
+						printf("Calibration successfully.\n");
+					}
+					else
+					{
+						exitValue = EXIT_UPDATE_FW_WITH_CALIBRATION_ERR;
+						printf("Calibration error occurs, please check the output. Err = %d.\n", ret);
+					}
+				}
+				else
+				{
+					printf("Not needed calibration.\n");
+				}
+				/* re-calibration after update finished */
+				
             }
 
             fclose(input_file);

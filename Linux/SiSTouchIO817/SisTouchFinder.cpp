@@ -62,14 +62,17 @@ SisTouchFinder::~SisTouchFinder()
 }
 
 const char*
-SisTouchFinder::autoDetectDevicePath()
+SisTouchFinder::autoDetectDevicePath(int detectHidrawFlag, int detectI2cFlag)
 {
 	// only detect hidraw
     /* Detect hidraw* */
-    const char* deviceName = autoDetectHidDevicePath();
-	if(deviceName != 0)
+	if(detectHidrawFlag == 1)
 	{
-	    return deviceName;
+	    const char* deviceName = autoDetectHidDevicePath();
+		if(deviceName != 0)
+		{
+	   		return deviceName;
+		}
 	}
 
 	return 0;
@@ -135,9 +138,13 @@ SisTouchFinder::isSisTouchHid(const char* deviceName)
 	    return false;
 	}
 
-	if(strstr(m_rawName, "HID") != NULL)
+	if(strstr(m_rawName, "SiS HID") != NULL)
 	{
 	    m_deviceType = USB_817;
+	}
+	else if(strstr(m_rawName, "hid-over-i2c") != NULL)
+	{
+		m_deviceType = HID_OVER_I2C_817;
 	}
 	else
 	{

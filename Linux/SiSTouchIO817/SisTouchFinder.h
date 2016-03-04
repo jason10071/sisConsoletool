@@ -18,12 +18,13 @@ public:
         UNKNOW = -1,
         USB_817 = 0,
         I2C_817 = 1,
+        HID_OVER_I2C_817 = 2,
     };
 	
     SisTouchFinder();
     ~SisTouchFinder();
 
-	const char* autoDetectDevicePath();
+	const char* autoDetectDevicePath(int detectHidrawFlag, int detectI2cFlag);
 	SisTouchFinder::DeviceType getDeviceType();
 
 	bool isSisTouchHid(const char* deviceName);

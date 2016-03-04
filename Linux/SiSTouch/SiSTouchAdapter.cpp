@@ -1109,10 +1109,11 @@ SiSTouchAdapter* SiSTouchAdapter::prepareAdapter(const Parameter & param)
 
 	// force to only detect hidraw
 	int detectHidrawFlag = 1; //param.m_detectHidrawFlag;
+	int detectI2cFlag = 0; //param.m_detectI2cFlag;
 
 	if(con == CON_AUTO)
 	{
-		con = SiSTouchIO::getDeviceType(max_retry, retry_delay, verbose, ioDelay, changeDiagMode, changePWRMode, detectHidrawFlag);
+		con = SiSTouchIO::getDeviceType(max_retry, retry_delay, verbose, ioDelay, changeDiagMode, changePWRMode, detectHidrawFlag, detectI2cFlag);
 	}
 
 	printf("con=%d\n\n", con);
@@ -1121,6 +1122,10 @@ SiSTouchAdapter* SiSTouchAdapter::prepareAdapter(const Parameter & param)
 	if(con == SiSTouchIO::CON_AEGIS_MULTI_FOR_NEW_DRIVER)
 	{
 		return new AegisMultiSiSTouchAdapter(max_retry, retry_delay, verbose, ioDelay, changeDiagMode, changePWRMode, detectHidrawFlag);
+	}
+	else if(con == SiSTouchIO::CON_AEGIS_HID_OVER_I2C) /* hid-over-i2c */
+	{
+		return new AegisHidOverI2CSiSTouchAdapter(max_retry, retry_delay, verbose, ioDelay, changeDiagMode, changePWRMode, detectHidrawFlag);
 	}
     else
     {

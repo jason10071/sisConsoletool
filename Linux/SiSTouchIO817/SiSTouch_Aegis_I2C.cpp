@@ -15,6 +15,10 @@
 //#error "SiS817 not support system call"
 #endif
 
+#define CLOSE_AFTER_RESET
+
+#define WAIT_DEVICE_REMOVE 3000
+
 #define DUMMYBYTE 0
 //HEADER_LENGTH is the byte count before Length field
 #define HEADER_LENGTH 2
@@ -261,7 +265,7 @@ SiSTouch_Aegis_I2C::call_00( unsigned char *data, int size )
         LOGI("call_00()");
     }
 
-    int ret = read_data(data, BUFFER_SIZE);
+    int ret = read_data(data, BUFFER_SIZE, DEFAULT_TIMEOUT);
 
     if ( m_verbose ) dbg_print_buffer_hex( 0x00, data, ret );
 
@@ -424,6 +428,10 @@ SiSTouch_Aegis_I2C::call_82()
     else
     {
 
+#ifdef CLOSE_AFTER_RESET
+        usleep(WAIT_DEVICE_REMOVE * 1000); // 20160303 add
+#endif
+
 #ifdef PWR_MODE
         if(m_ChangePWRMode)
         {
@@ -522,6 +530,11 @@ SiSTouch_Aegis_I2C::call_82_without_retry()
     }
     else
     {
+    
+#ifdef CLOSE_AFTER_RESET
+        usleep(WAIT_DEVICE_REMOVE * 1000); // 20160303 add
+#endif
+
 #ifdef PWR_MODE
         if(m_ChangePWRMode)
         {
@@ -1425,12 +1438,12 @@ SiSTouch_Aegis_I2C::io_start_driver()
 
 
 int
-SiSTouch_Aegis_I2C::io_command(unsigned char * buf, int size, int sleepms)
+SiSTouch_Aegis_I2C::io_command(unsigned char * buf, int size, int sleepms, int wTimeout, int rTimeout)
 {
     int ret = 0;
     unsigned char cmd = buf[6];
 
-    ret = write_data(buf, size);
+    ret = write_data(buf, size, wTimeout);
 
     if(ret < 0)
     {
@@ -1442,7 +1455,7 @@ SiSTouch_Aegis_I2C::io_command(unsigned char * buf, int size, int sleepms)
         usleep(sleepms * 1000);
     }
 
-    ret = read_data(buf, BUFFER_SIZE);
+    ret = read_data(buf, BUFFER_SIZE, rTimeout);
 
     if ( m_verbose ) dbg_print_buffer_hex( cmd, buf, ret );
 
@@ -1456,7 +1469,7 @@ SiSTouch_Aegis_I2C::io_command(unsigned char * buf, int size, int sleepms)
 
 
 int
-SiSTouch_Aegis_I2C::write_data(unsigned char * buf, int size)
+SiSTouch_Aegis_I2C::write_data(unsigned char * buf, int size, int timeout)
 {
     int ret = 0;
 #ifdef VIA_IOCTL
@@ -1469,7 +1482,7 @@ SiSTouch_Aegis_I2C::write_data(unsigned char * buf, int size)
 }
 
 int
-SiSTouch_Aegis_I2C::read_data( unsigned char * buf, int size)
+SiSTouch_Aegis_I2C::read_data( unsigned char * buf, int size, int timeout)
 {
     int ret = 0;
 #ifdef VIA_IOCTL
@@ -1581,13 +1594,13 @@ SiSTouch_Aegis_I2C::make_simple_buffer( int cmd )
 
 //simple_io : transfer no payload command
 int
-SiSTouch_Aegis_I2C::simple_io( int cmd, int sleepms )
+SiSTouch_Aegis_I2C::simple_io( int cmd, int sleepms, int wTimeout, int rTimeout )
 {
 
 	if ( m_verbose ) LOGI("simple_io : %02x DELAY=%d", cmd, sleepms);
     make_simple_buffer(cmd);
 
-    int ret = write_data( m_buffer, 8 );
+    int ret = write_data( m_buffer, 8, wTimeout );
 
     if(ret < 0)
     {
@@ -1599,7 +1612,7 @@ SiSTouch_Aegis_I2C::simple_io( int cmd, int sleepms )
         usleep(sleepms * 1000);
     }
 
-    ret = read_data(m_buffer, BUFFER_SIZE );
+    ret = read_data(m_buffer, BUFFER_SIZE, rTimeout );
 
     if ( m_verbose ) dbg_print_buffer_hex( cmd, m_buffer, ret );
 
@@ -1774,7 +1787,7 @@ SiSTouch_Aegis_I2C::device_Exist()
 int
 SiSTouch_Aegis_I2C::test_write_data(unsigned char * buf, int size)
 {
-	int ret = write_data(buf, size);
+	int ret = write_data(buf, size, DEFAULT_TIMEOUT);
 	if(ret < 0)
 	{
 		ret = parse_syscall_return_value( ret, GENERAL_TYPE_FLAG );
@@ -1786,7 +1799,7 @@ SiSTouch_Aegis_I2C::test_write_data(unsigned char * buf, int size)
 int
 SiSTouch_Aegis_I2C::test_read_data( unsigned char * buf, int size)
 {
-	int ret = read_data(buf, size);
+	int ret = read_data(buf, size, DEFAULT_TIMEOUT);
 	if (ret < 0)
 	{
 		ret = parse_syscall_return_value(ret, GENERAL_TYPE_FLAG);

@@ -204,12 +204,12 @@ SiSTouch_Aegis_I2C_FOR_NEW_DRIVER::stop_driver()
 }
 
 int
-SiSTouch_Aegis_I2C_FOR_NEW_DRIVER::io_command(unsigned char * buf, int size, int sleepms)
+SiSTouch_Aegis_I2C_FOR_NEW_DRIVER::io_command(unsigned char * buf, int size, int sleepms, int wTimeout, int rTimeout)
 {
     int ret = 0;
     unsigned char cmd = buf[6];
 
-    ret = write_data(buf, size);
+    ret = write_data(buf, size, wTimeout);
 
     if(ret < 0)
     {
@@ -221,7 +221,7 @@ SiSTouch_Aegis_I2C_FOR_NEW_DRIVER::io_command(unsigned char * buf, int size, int
         usleep(sleepms * 1000);
     }
 
-    ret = read_data(buf, BUFFER_SIZE);
+    ret = read_data(buf, BUFFER_SIZE, rTimeout);
 
 	/* read Length_field */
 	if(ret > 0)
@@ -242,13 +242,13 @@ SiSTouch_Aegis_I2C_FOR_NEW_DRIVER::io_command(unsigned char * buf, int size, int
 
 //simple_io : transfer no payload command
 int
-SiSTouch_Aegis_I2C_FOR_NEW_DRIVER::simple_io( int cmd, int sleepms )
+SiSTouch_Aegis_I2C_FOR_NEW_DRIVER::simple_io( int cmd, int sleepms, int wTimeout, int rTimeout )
 {
 
 	if ( m_verbose ) LOGI("simple_io : %02x DELAY=%d", cmd, sleepms);
     make_simple_buffer(cmd);
 
-    int ret = write_data( m_buffer, 8 );
+    int ret = write_data( m_buffer, 8, wTimeout );
 
     if(ret < 0)
     {
@@ -260,7 +260,7 @@ SiSTouch_Aegis_I2C_FOR_NEW_DRIVER::simple_io( int cmd, int sleepms )
         usleep(sleepms * 1000);
     }
 
-    ret = read_data(m_buffer, BUFFER_SIZE );
+    ret = read_data(m_buffer, BUFFER_SIZE, rTimeout );
 
     /* read Length_field */
 	if(ret > 0)

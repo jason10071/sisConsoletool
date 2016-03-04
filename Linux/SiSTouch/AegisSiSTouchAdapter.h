@@ -272,6 +272,7 @@ protected:
 	virtual int eraseCalibrationFlag(bool checkBootLoader = false);
     virtual void prepaerBuffer(int *buf, int buf_length);
     virtual int isSiSFWFile(int* buf, int buf_length);
+	virtual bool checkCalibrationNeeded();
 
     virtual int parameterCheck(bool& update_bootloader, bool& update_bootloader_auto, bool &isNewBootloader, bool& reserve_RODATA, bool &update_parameter, bool force_update, int *buf, int file_Length);
 
@@ -308,7 +309,7 @@ public:
 
     }
 
-	AegisI2CSiSTouchAdapter( int max_retry, int delay, int verbose, int ioDelay, int changeDiagMode, int changePWRMode, int detectHidrawFlag )
+	AegisI2CSiSTouchAdapter( int max_retry, int delay, int verbose, int ioDelay, int changeDiagMode, int changePWRMode, int detectI2cFlag )
         : AegisSiSTouchAdapter(new SiSTouch_Aegis_I2C_FOR_NEW_DRIVER(max_retry, delay, verbose, ioDelay, changeDiagMode, changePWRMode), max_retry, delay, verbose, ioDelay, changeDiagMode, changePWRMode)
     {
 
@@ -317,6 +318,26 @@ public:
     virtual int isSiSFWFile(int* buf, int buf_length);
 
 };
+
+class AegisHidOverI2CSiSTouchAdapter : public AegisSiSTouchAdapter
+{
+public:
+	AegisHidOverI2CSiSTouchAdapter( int max_retry, int delay, int verbose, int ioDelay, int changeDiagMode, int changePWRMode )
+        : AegisSiSTouchAdapter(new SiSTouch_Aegis_Hid_Over_I2C(max_retry, delay, verbose, ioDelay, changeDiagMode, changePWRMode), max_retry, delay, verbose, ioDelay, changeDiagMode, changePWRMode)
+    {
+
+    }
+		
+	AegisHidOverI2CSiSTouchAdapter( int max_retry, int delay, int verbose, int ioDelay, int changeDiagMode, int changePWRMode, int detectHidrawFlag )
+        : AegisSiSTouchAdapter(new SiSTouch_Aegis_Hid_Over_I2C(max_retry, delay, verbose, ioDelay, changeDiagMode, changePWRMode), max_retry, delay, verbose, ioDelay, changeDiagMode, changePWRMode)
+    {
+
+    }
+
+    virtual int isSiSFWFile(int* buf, int buf_length);
+
+};
+
 
 class AegisUSBSiSTouchAdapter : public AegisSiSTouchAdapter
 {

@@ -86,6 +86,7 @@ public:
         CON_AEGIS_MULTI = 7,
         CON_AEGIS_MULTI_FOR_NEW_DRIVER = 8,
         CON_AEGIS_I2C_FOR_NEW_DRIVER = 9,
+        CON_AEGIS_HID_OVER_I2C = 10,
         CON_CUSTOM = 99,
     };
 
@@ -176,7 +177,7 @@ public:
     static int setActiveDeviceName(char* devName, int devNameLen);
     static char *getActiveDeviceName();
 	static int getDeviceType(int max_retry, int retry_delay, int verbose, int ioDelay, int changeDiagMode, int changePWRMode);
-    static int getDeviceType(int max_retry, int retry_delay, int verbose, int ioDelay, int changeDiagMode, int changePWRMode, int detectHidrawFlag);
+    static int getDeviceType(int max_retry, int retry_delay, int verbose, int ioDelay, int changeDiagMode, int changePWRMode, int detectHidrawFlag, int detectI2cFlag);
 
     static char m_activeDeviceName[DEVNAME_MAX_LEN];
     //[end] 20130627 support multi-device
@@ -447,6 +448,12 @@ private:
 class SiSTouch_Aegis_I2C : public SiSTouchIO
 {
 public:
+	enum
+    {
+        DEFAULT_TIMEOUT = 1000,
+		CMD81_TIMEOUT = 3000,
+		CMD87_TIMEOUT = 12000,
+    };
 
     SiSTouch_Aegis_I2C( int max_retry, int delay, int verbose, int ioDelay, int changeDiagMode, int changePWRMode)
         : SiSTouchIO( max_retry, delay, verbose, 1, ioDelay, changeDiagMode, changePWRMode)
@@ -497,7 +504,7 @@ protected:
     virtual int make_90_buffer( int powermode );
     virtual int make_command_buffer( int cmd, int size, unsigned char *data, int addcrc );
 
-private:
+protected:
 	
 	
     void make_common_header( int cmd, int length );
@@ -515,14 +522,14 @@ private:
     //20120926
 
 protected:
-	int io_stop_driver();
+	virtual int io_stop_driver();
 	int io_start_driver();
 	
-	virtual int simple_io( int cmd, int sleepms = 0 );
-    virtual int io_command(unsigned char * buf, int size, int sleepms = 0);
+	virtual int simple_io( int cmd, int sleepms = 0, int wTimeout = DEFAULT_TIMEOUT, int rTimeout = DEFAULT_TIMEOUT );
+    virtual int io_command(unsigned char * buf, int size, int sleepms = 0, int wTimeout = DEFAULT_TIMEOUT, int rTimeout = DEFAULT_TIMEOUT);
 
-	int write_data(unsigned char * buf, int size);
-    int read_data(unsigned char * buf, int size);
+	virtual int write_data(unsigned char * buf, int size, int timeout);
+    virtual int read_data(unsigned char * buf, int size, int timeout);
 
 };
 
@@ -541,11 +548,37 @@ public:
 	static const char* get_device_name();
 
 private:
-	virtual int io_command(unsigned char * buf, int size, int sleepms = 0);
-	virtual int simple_io( int cmd, int sleepms = 0 );
+	virtual int io_command(unsigned char * buf, int size, int sleepms = 0, int wTimeout = DEFAULT_TIMEOUT, int rTimeout = DEFAULT_TIMEOUT);
+	virtual int simple_io( int cmd, int sleepms = 0, int wTimeout = DEFAULT_TIMEOUT, int rTimeout = DEFAULT_TIMEOUT );
 
 };
 
+/* hid-over-i2c: for /dev/hidraw* device */
+class SiSTouch_Aegis_Hid_Over_I2C : public SiSTouch_Aegis_I2C
+{
+public:
+
+    SiSTouch_Aegis_Hid_Over_I2C( int max_retry, int delay, int verbose, int ioDelay, int changeDiagMode, int changePWRMode)
+        : SiSTouch_Aegis_I2C( max_retry, delay, verbose, ioDelay, changeDiagMode, changePWRMode)
+    {
+    }
+
+	virtual int call_04();
+    virtual int call_82();
+    virtual int call_82_without_retry();
+	virtual int call_85( int data );
+    virtual int call_87();
+
+	static const char* get_device_name();
+
+private:
+	virtual int io_stop_driver();
+	virtual int write_data(unsigned char * buf, int size, int timeout);
+    virtual int read_data(unsigned char * buf, int size, int timeout);
+	
+	void waitIOReady(int &fd, int timeoutSec);
+
+};
 
 class SiSTouch_Aegis_USB : public SiSTouchIO
 {

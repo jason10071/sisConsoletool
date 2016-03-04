@@ -272,6 +272,7 @@ protected:
     bool isCalibrationDone();
     float transferRawDataToVoltage(int rawData);
     float transferRawDataToCycle(int rawData);
+
 private:
     // copy constructor
     SiSTouchAdapter(const SiSTouchAdapter & rhs): m_io(0) {}
