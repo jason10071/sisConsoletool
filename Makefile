@@ -1,18 +1,30 @@
-ANDROID_MAKE=ndk-build
+all: BUILD_LIB
+	@cd CT               && $(MAKE)
+	
+BUILD_LIB:
+	@cd SiSLog           && $(MAKE)
+	@cd SiSExpressionLib && $(MAKE)
+	@cd SiSDeviceIO      && $(MAKE)
+	@cd SiSProcedure     && $(MAKE)
+	@cd CTBase           && $(MAKE)
+	
+CLEAN_LIB:
+	@cd SiSLog           && $(MAKE) clean
+	@cd SiSExpressionLib && $(MAKE) clean
+	@cd SiSDeviceIO      && $(MAKE) clean
+	@cd SiSProcedure     && $(MAKE) clean
+	@cd CTBase           && $(MAKE) clean
 
-all: BUILD_LINUX
-
-BUILD_LINUX:
-	@cd Linux && $(MAKE)
-BUILD_ANDROID:
-	@cd Android && $(ANDROID_MAKE)
-CLEAN_LINUX:
-	@cd Linux && $(MAKE) clean
-CLEAN_ANDROID:
-	@cd Android && $(ANDROID_MAKE) clean
-CLEAN_LINUX_ALL:
-	@cd Linux && $(MAKE) clean_all
-CLEAN_ANDROID_ALL:
-	@rm -vfr Android/libs Android/obj
-clean: CLEAN_LINUX CLEAN_ANDROID
-clean_all: CLEAN_LINUX_ALL CLEAN_ANDROID_ALL
+clean:CLEAN_LIB
+	@cd CT               && $(MAKE) clean
+	
+CLEAN_LIB_ALL:
+	@cd SiSLog           && $(MAKE) clean_all
+	@cd SiSExpressionLib && $(MAKE) clean_all
+	@cd SiSDeviceIO      && $(MAKE) clean_all
+	@cd SiSProcedure     && $(MAKE) clean_all
+	@cd CTBase           && $(MAKE) clean_all
+	
+clean_all:CLEAN_LIB_ALL
+	@cd CT               && $(MAKE) clean_all
+	@rm -vfr bin lib
