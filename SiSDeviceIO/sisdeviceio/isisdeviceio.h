@@ -1,6 +1,8 @@
 #ifndef ISISDEVICEIO_H
 #define ISISDEVICEIO_H
 
+#include <unistd.h>
+#include <sys/syscall.h>
 #include "stdio.h"
 #include "string"
 

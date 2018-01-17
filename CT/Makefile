@@ -3,7 +3,7 @@
 ###############################################################################
 CC       = gcc
 CXX      = g++
-DEFINES  = -DAPP_VERSION=\"1.5.3.116\"
+DEFINES  = -DAPP_VERSION=\"1.5.3.117\"
 CFLAGS   += -g -Wall $(DEFINES) -pthread
 CXXFLAGS = $(CFLAGS) -Weffc++ $(DEFINES)
 LIBS     = -lm -lCTBase -lSiSProcedure -lSiSLog -lSiSExpressionLib -lSiSDeviceIO -L../lib -static
