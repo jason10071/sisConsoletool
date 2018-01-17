@@ -3,8 +3,8 @@
 ###############################################################################
 CC       = gcc
 CXX      = g++
-CFLAGS   += -g -Wall
-CXXFLAGS = $(CFLAGS) -Weffc++
+CFLAGS   += -g -Wall -fexceptions
+CXXFLAGS = $(CFLAGS) -Weffc++ -fexceptions
 LIBS     = -lm
 INCPATH  = -I. -I../SiSLog -I../SiSDeviceIO
 DIR      = $(shell pwd)
