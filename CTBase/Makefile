@@ -3,8 +3,8 @@
 ###############################################################################
 CC       = gcc
 CXX      = g++
-CFLAGS   += -g -Wall -fexceptions -clang
-CXXFLAGS = $(CFLAGS) -Weffc++ -fexceptions -clang
+CFLAGS   += -g -Wall -fexceptions -clang -print-* -E
+CXXFLAGS = $(CFLAGS) -Weffc++ -fexceptions -clang -print-* -E
 LIBS     = -lm
 INCPATH  = -I. -I../SiSLog -I../SiSExpressionLib -I../SiSDeviceIO -I../SiSProcedure -I./getFirmwareId -I./updateFW 
 DIR      = $(shell pwd)
