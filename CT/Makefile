@@ -1,11 +1,11 @@
 ###############################################################################
 # compiler setting
 ###############################################################################
-CC       = gcc
-CXX      = g++
-DEFINES  = -DAPP_VERSION=\"1.5.3.123\"
-CFLAGS   += -g -Wall $(DEFINES) -pthread -fexceptions -clang -print-* -E
-CXXFLAGS = $(CFLAGS) -Weffc++ $(DEFINES) -pthread -fexceptions -clang -print-* -E
+CC       ?= gcc
+CXX      ?= g++
+DEFINES  = -DAPP_VERSION=\"1.5.3.1233\"
+CFLAGS   += -g -Wall $(DEFINES) -pthread -fexceptions
+CXXFLAGS = $(CFLAGS) -Weffc++ $(DEFINES) -pthread -fexceptions
 LIBS     = -lm -lCTBase -lSiSProcedure -lSiSLog -lSiSExpressionLib -lSiSDeviceIO -L../lib -static
 INCPATH  = -I. -I../SiSLog -I../SiSExpressionLib -I../SiSDeviceIO -I../SiSProcedure -I../CTBase -I../CTBase/getFirmwareId -I../CTBase/updateFW 
 DIR      = $(shell pwd)

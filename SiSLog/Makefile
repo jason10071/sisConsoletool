@@ -1,10 +1,10 @@
 ###############################################################################
 # compiler setting
 ###############################################################################
-CC       = gcc
-CXX      = g++
-CFLAGS   += -g -Wall -fexceptions -clang -print-* -E
-CXXFLAGS = $(CFLAGS) -Weffc++ -fexceptions -clang -print-* -E
+CC       ?= gcc
+CXX      ?= g++
+CFLAGS   += -g -Wall -fexceptions
+CXXFLAGS = $(CFLAGS) -Weffc++ -fexceptions
 LIBS     = -lm
 INCPATH  = -I.
 DIR      = $(shell pwd)
