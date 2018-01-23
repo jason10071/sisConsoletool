@@ -20,6 +20,9 @@ public:
     SiSDeviceAttribute();
     ~SiSDeviceAttribute();
 
+    std::string getDeviceName();
+    void setDeviceName(std::string deviceName);
+
     std::string getNodeName();
     void setNodeName(std::string nodeName);
 
@@ -36,6 +39,7 @@ public:
     void setRawName(std::string rawName);
 
 private:
+    std::string m_deviceName;
     std::string m_nodeName;
     SiSDeviceAttribute::ConnectType m_connectType;
     int m_vid;

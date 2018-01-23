@@ -1,6 +1,7 @@
 #include "sisdeviceattribute.h"
 
 SiSDeviceAttribute::SiSDeviceAttribute() :
+    m_deviceName(""),
     m_nodeName(""),
     m_connectType(SiSDeviceAttribute::CON_UNKNOW),
     m_vid(0x0),
@@ -13,6 +14,18 @@ SiSDeviceAttribute::SiSDeviceAttribute() :
 SiSDeviceAttribute::~SiSDeviceAttribute()
 {
 
+}
+
+std::string
+SiSDeviceAttribute::getDeviceName()
+{
+   return this->m_deviceName;
+}
+   
+void
+SiSDeviceAttribute::setDeviceName(std::string deviceName)
+{
+    this->m_deviceName = deviceName;
 }
 
 std::string

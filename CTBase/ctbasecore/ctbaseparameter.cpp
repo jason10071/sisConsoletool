@@ -2,6 +2,7 @@
 
 #include "sislog.h"
 #include "ctexception/ctexception.h"
+#include "shellcommand/shellcommand.h"
 
 using namespace CT;
 using namespace CT::CTBP;
@@ -260,9 +261,39 @@ CTBaseParameter::setArgument(ArgumentExpression* argumentExpression)
         }
         else if( argumentExpression->getName().compare( ARG_DEVICE_ID ) == 0 )
         {
-            this->m_deviceID = "/dev/";
-            this->m_deviceID.append( argumentExpression->getValue() );
-            SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "set (append /dev/) deviceID : %s", m_deviceID.c_str());
+            std::string deviceID = argumentExpression->getValue();
+			
+            /* convert hidraw* to device path */
+            std::string hidrawStr = "hidraw";
+			std::string hidrawNum = argumentExpression->getValue();
+            if( hidrawNum.substr(0, hidrawStr.size()) == hidrawStr ) // if startswith "hidraw"
+            {
+                /* find ls_sys_class_hidraw_hidrawN */
+                std::string cmd_ls_sys_class_hidraw_hidrawN = "ls -l /sys/class/hidraw/"; // " ls -l /sys/class/hidraw/hidraw* "
+                cmd_ls_sys_class_hidraw_hidrawN.append( hidrawNum );
+                SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "cmd : %s", cmd_ls_sys_class_hidraw_hidrawN.c_str() );
+                std::string ls_sys_class_hidraw_hidrawN = ShellCommand::exec( cmd_ls_sys_class_hidraw_hidrawN.c_str() );
+                SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "output : %s", ls_sys_class_hidraw_hidrawN.c_str() );
+
+                /* parse to deviceID */
+                std::string keywordStr1 = "-> ../../";
+				std::string keywordStr2 = "/hidraw/hidraw";
+                if( ls_sys_class_hidraw_hidrawN.find(keywordStr1) != std::string::npos &&
+                    ls_sys_class_hidraw_hidrawN.find(keywordStr2) != std::string::npos )
+                {
+                    std::string tmpDeviceID = ls_sys_class_hidraw_hidrawN;
+                    tmpDeviceID = tmpDeviceID.substr( tmpDeviceID.find(keywordStr1) + keywordStr1.size(), tmpDeviceID.size());
+                    tmpDeviceID = tmpDeviceID.substr(0, tmpDeviceID.find(keywordStr2));
+                    tmpDeviceID = tmpDeviceID.substr(0, tmpDeviceID.find_last_of("/")); // remove device (0000:0000:0000.0000)
+
+                    deviceID = "/sys/";
+                    deviceID.append(tmpDeviceID);
+                }
+            }
+
+            /* assign deviceID */
+            this->m_deviceID = deviceID;
+            SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "set deviceID : \"%s\"", m_deviceID.c_str());
             return true;
         }
         if( argumentExpression->getName().compare( ARG_DIS_CTL_REPORT_TO_OS ) == 0 )
@@ -446,7 +477,7 @@ CTBaseParameter::setArgument(ArgumentExpression* argumentExpression)
     return false;
 }
 
-bool
+ bool
 CTBaseParameter::hasArgumentConflict()
 {
     /* no conflict */

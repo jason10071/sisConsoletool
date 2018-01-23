@@ -20,7 +20,7 @@ public:
     void clearDeviceAttributeList();
 
     SiSDeviceAttribute* getOpened();
-    bool detectByHidrawName(std::string hidrawName);
+    bool detectByHidrawName(std::string deviceName);
 
 private:
     SiSDeviceAttribute* getElement(SiSDeviceAttributeList _list, int _i);

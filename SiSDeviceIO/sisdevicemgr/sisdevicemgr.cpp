@@ -95,13 +95,36 @@ SiSDeviceMgr::getElement(SiSDeviceAttributeList _list, int _i)
 }
 
 bool
-SiSDeviceMgr::detectByHidrawName(std::string hidrawName)
+SiSDeviceMgr::detectByHidrawName(std::string deviceName)
 {
-    SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "detectByHidrawName : %s", hidrawName.c_str());
+    /* find hidrawNum */
+    std::string cmd_ls_device_name_hidraw = "ls "; // " ls /sys/device/hidraw/ "
+    cmd_ls_device_name_hidraw.append(deviceName);
+    cmd_ls_device_name_hidraw.append("/*:*:*.*/hidraw/"); // append device (0000:0000:0000.0000)
+    SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "cmd : %s", cmd_ls_device_name_hidraw.c_str() );
+    std::string hidrawNum = ShellCommand::exec( cmd_ls_device_name_hidraw.c_str() );
+    if (!hidrawNum.empty() && hidrawNum[hidrawNum.length()-1] == '\n')
+    {
+        hidrawNum.erase(hidrawNum.length() - 1);
+    }
+    SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "output (hidrawNum) : %s", hidrawNum.c_str() );
+
+    if( hidrawNum.empty() )
+    {
+        SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "Not (available) sis touch : hidrawNum is empty\n");
+        return false;
+    }
+
+    /* using hidrawNode */
+    std::string hidrawNode = "/dev/";
+    hidrawNode.append(hidrawNum);
+
+    SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "detectByHidrawName : %s (\"%s\")", deviceName.c_str(), hidrawNode.c_str() );
 
     SiSDeviceAttribute* newSiSDeviceAttribute = new SiSDeviceAttribute();
+    newSiSDeviceAttribute->setDeviceName( deviceName );
 
-    if( hidrawName.find("/dev/hidraw") == 0 && getHidInfo( hidrawName.c_str(), newSiSDeviceAttribute) )
+    if( hidrawNode.find("/dev/hidraw") == 0 && getHidInfo( hidrawNode.c_str(), newSiSDeviceAttribute) )
     {
         if( newSiSDeviceAttribute->getVID() != 0x0457 )
         {
@@ -110,32 +133,20 @@ SiSDeviceMgr::detectByHidrawName(std::string hidrawName)
             return false;
         }
 
-        /* find hidrawNum */
-        std::string hidrawNum = hidrawName;
-        hidrawNum.replace(0, 5, ""); 
-        //SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "hidrawNum : %s", hidrawNum.c_str() );
-
-        /* find ls_sys_class_hidraw_hidrawN */
-        std::string cmd_ls_sys_class_hidraw_hidrawN = "ls -l /sys/class/hidraw/"; // " ls -l /sys/class/hidraw/hidraw* "
-        cmd_ls_sys_class_hidraw_hidrawN.append(hidrawNum);
-        SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "cmd : %s", cmd_ls_sys_class_hidraw_hidrawN.c_str() );
-        std::string ls_sys_class_hidraw_hidrawN = ShellCommand::exec( cmd_ls_sys_class_hidraw_hidrawN.c_str() );
-        SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "output : %s", ls_sys_class_hidraw_hidrawN.c_str() );
-
         /* judge what interface */
-        if( ls_sys_class_hidraw_hidrawN.find("/usb") != std::string::npos )
+        if( deviceName.find("/usb") != std::string::npos )
         {
         	newSiSDeviceAttribute->setConnectType( SiSDeviceAttribute::CON_819_USB_HID	);
         }
-        else if( ls_sys_class_hidraw_hidrawN.find("/i2c") != std::string::npos	)
+        else if( deviceName.find("/i2c") != std::string::npos	)
         {
         	newSiSDeviceAttribute->setConnectType( SiSDeviceAttribute::CON_819_HID_OVER_I2C  );
         }
-        else if( ls_sys_class_hidraw_hidrawN.find("usb") != std::string::npos )
+        else if( deviceName.find("usb") != std::string::npos )
         {
         	newSiSDeviceAttribute->setConnectType( SiSDeviceAttribute::CON_819_USB_HID	);
         }
-        else if( ls_sys_class_hidraw_hidrawN.find("i2c") != std::string::npos	)
+        else if( deviceName.find("i2c") != std::string::npos	)
         {
         	newSiSDeviceAttribute->setConnectType( SiSDeviceAttribute::CON_819_HID_OVER_I2C  );
         }

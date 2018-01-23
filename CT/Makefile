@@ -3,7 +3,7 @@
 ###############################################################################
 CC       = gcc
 CXX      = g++
-DEFINES  = -DAPP_VERSION=\"1.5.3.119\"
+DEFINES  = -DAPP_VERSION=\"1.5.3.123\"
 CFLAGS   += -g -Wall $(DEFINES) -pthread -fexceptions
 CXXFLAGS = $(CFLAGS) -Weffc++ $(DEFINES) -pthread -fexceptions
 LIBS     = -lm -lCTBase -lSiSProcedure -lSiSLog -lSiSExpressionLib -lSiSDeviceIO -L../lib -static

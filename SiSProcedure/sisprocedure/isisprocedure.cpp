@@ -150,9 +150,9 @@ ISiSProcedure::openDevice(std::string deviceID)
 //        SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "ISiSProcedure::openDevice, m_sisCore set READ_MODE : READ_BY_HID" );
 //        //-------------------------------------------------------------------------------------------------------------
 
-//        /* read deviceID */
-//        deviceID = m_sisCore->attribute(PHYS_LOCATION);
-//        SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "open SiS Device succeed : %s", deviceID.c_str() );
+        /* read deviceID */
+        deviceID = m_sisDeviceIO->deviceNameOpened();
+        SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "open SiS Device succeed : %s", deviceID.c_str() );
 
 //        /* show device info */
 //        SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "DEV_TYPE : %s", m_sisCore->attribute(DEV_TYPE).c_str() );

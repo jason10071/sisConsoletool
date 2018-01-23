@@ -78,7 +78,7 @@ std::string
 ISiSDeviceIO::deviceNameOpened()
 {
     SiSDeviceAttribute* opened = m_sisDeviceMgr->getOpened();
-    return opened->getNodeName();
+    return opened->getDeviceName();
 }
 
 SiSDeviceMgr* 
@@ -125,7 +125,7 @@ ISiSDeviceIO::boot(std::string deviceName)
     }
 
 	/* show info */
-    SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "opened : %s",  opened->getNodeName().c_str() );
+    SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "opened : %s (\"%s\")",  opened->getDeviceName().c_str(), opened->getNodeName().c_str() );
     SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "CON : %d", opened->getConnectType() );
     SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "rawname : %s", opened->getRawName().c_str() );
     SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "VID : 0x%04hx", opened->getVID() );
