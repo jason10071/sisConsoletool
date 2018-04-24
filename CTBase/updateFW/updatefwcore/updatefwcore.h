@@ -40,6 +40,8 @@ protected:
     virtual void checkAllBinDeviceType() {}
     virtual void checkAllBinInterfaceID() {}
     virtual void checkAllBinSelectiveID() {}
+    virtual void checkMasterBinProductID() {}
+    virtual void checkAllBinProductID() {}
     virtual bool ifNeedMasterRecovery() { return false; }
     virtual bool ifNeedRestructureBootloader() { return false; }
     virtual bool ifNeedRestructureBootloader(int chipIndex) { return false; }

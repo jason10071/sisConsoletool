@@ -34,6 +34,11 @@ public:
     SerialData* getPriorLastTime();
     SerialData* getTaskID();
     FwVersion getFwVersion();
+    SerialData* getProductID();
+
+    SerialData* getUpdateMark();
+    SerialData* getLastUpdateMark();
+    SerialData* getPriorLastUpdateMark();
 
     void setDeviceType(DeviceType deviceType);
     void setBroken(bool brokenFlag);
@@ -52,6 +57,12 @@ public:
     void setPriorLastTime(SerialData* priorLastTime);
     void setTaskID(SerialData* taskID);
     void setFwVersion(FwVersion fwVersion);
+    void setProductID(SerialData* productID);
+
+    void setUpdateMark(SerialData* updateMark);
+    void setLastUpdateMark(SerialData* lastUpdateMark);
+    void setPriorLastUpdateMark(SerialData* priorLastUpdateMark);
+
 
 protected:
     DeviceType m_deviceType;
@@ -71,6 +82,11 @@ protected:
     SerialData* m_priorLastTime;
     SerialData* m_taskID;
     FwVersion m_fwVersion;
+    SerialData* m_productID; // Note : different to PID
+
+    SerialData* m_updateMark;
+    SerialData* m_lastUpdateMark;
+    SerialData* m_priorLastUpdateMark;
 };
 
 #endif // CTBASEREFERENCE_H

@@ -10,6 +10,8 @@
 
 //#include "CptFactoryFacade.h"
 
+#include <string.h>
+
 using namespace std;
 using namespace SiS::Procedure;
 using namespace SiS;
@@ -147,6 +149,20 @@ RomSegmentBD_817_r64k::execClearBootFlag(unsigned char* binBuffer, int binSize)
     memset(fakeBinBuffer, 0x0, binSize * sizeof(unsigned char) );
     memcpy(fakeBinBuffer + getAddressProvider()->getAddress(romKey),
            dataBuf, dataSize * sizeof(unsigned char) );
+
+    /* get updateTimeAddress / get updateFwInfoAddress */
+    unsigned int updateTimeAddress = getAddressProvider()->getAddress("FA_LAST_TIME_ROM");
+    unsigned int isUpdateBootloaderInfoAddress = getAddressProvider()->getAddress("FA_IS_UPDATE_BOOTLOADER_INFO_ROM");
+    unsigned int updateFwInfoAddress = getAddressProvider()->getAddress("FA_UPDATE_FW_INFO_ROM");
+    SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "buried update fw information : updateFwInfoAddress=0x%x", updateFwInfoAddress );
+
+    /* buried updateFwInfo */
+    fakeBinBuffer[updateFwInfoAddress] = binBuffer[updateTimeAddress];
+    fakeBinBuffer[updateFwInfoAddress + 1] = binBuffer[updateTimeAddress + 1];
+    fakeBinBuffer[updateFwInfoAddress + 2] = binBuffer[updateTimeAddress + 2];
+    fakeBinBuffer[updateFwInfoAddress + 3] = binBuffer[updateTimeAddress + 3];
+    fakeBinBuffer[updateFwInfoAddress + 4] = binBuffer[isUpdateBootloaderInfoAddress];
+    fakeBinBuffer[updateFwInfoAddress + 5] = binBuffer[isUpdateBootloaderInfoAddress + 1];
 
     /* get bootFlagAddress */
     unsigned int bootFlagAddress = getAddressProvider()->getAddress("FA_BOOT_FLAG_ROM");

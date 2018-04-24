@@ -4,6 +4,8 @@
 #include "spexception/spexception.h"
 #include "spbase/sisproceduredefine.h"
 
+#include <string.h>
+
 #ifdef WIN32
 #include <windows.h>
 #else

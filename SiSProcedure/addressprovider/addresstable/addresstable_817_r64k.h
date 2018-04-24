@@ -38,6 +38,7 @@ FML_CLEAR_CALIBRATION_FLAG_ROM                  0xe000          4k          \n\
 FML_CLEAR_CALIBRATION_FLAG_XRAM                 0xa000e000      4k          \n\
 \
 # FW Attribute                                                  \n\
+FA_UPDATE_FW_INFO_ROM               0xe000          6           \n\
 FA_BOOT_FLAG_ROM                    0xeff0          4           \n\
 FA_BOOT_FLAG_XRAM                   0xa000eff0      4           \n\
 FA_0X0238_ROM                       0x0238          1           \n\
@@ -58,10 +59,10 @@ FA_0X020C_ROM                       0x020c          4           \n\
 FA_0X020C_XRAM                      0xa000020c      4           \n\
 FA_FIRMWARE_ID_ROM                  0xc004          12          \n\
 FA_FIRMWARE_ID_XRAM                 0xa000c004      12          \n\
-FA_BOOTLOADER_ID_ROM                0xc030          4           \n\
-FA_BOOTLOADER_ID_XRAM               0xa000c030      4           \n\
-FA_BOOT_CODE_CRC_ROM                0xc048          4           \n\
-FA_BOOT_CODE_CRC_XRAM               0xa000c048      4           \n\
+FA_BOOTLOADER_ID_ROM                0x0230          4           \n\
+FA_BOOTLOADER_ID_XRAM               0xa0000230      4           \n\
+FA_BOOT_CODE_CRC_ROM                0x0234          4           \n\
+FA_BOOT_CODE_CRC_XRAM               0xa0000234      4           \n\
 FA_MAIN_CODE_CRC_ROM                0xc044          4           \n\
 FA_MAIN_CODE_CRC_XRAM               0xa000c044      4           \n\
 FA_LAST_ID_ROM                      0xc0a0          12          \n\
@@ -80,6 +81,10 @@ FA_TASK_ID_ROM                      0xc00c          2           \n\
 FA_TASK_ID_XRAM                     0xa000c00c      2           \n\
 FA_FW_VERSION_ROM                   0xc00e          2           \n\
 FA_FW_VERSION_XRAM                  0xa000c00e      2           \n\
+FA_UPDATE_MARK_ROM                  0xc000          4           \n\
+FA_UPDATE_MARK_XRAM                 0xa000c000      4           \n\
+FA_IS_UPDATE_BOOTLOADER_INFO_ROM    0xc0d6          2           \n\
+FA_IS_UPDATE_BOOTLOADER_INFO_XRAM   0xa000c0d6      2           \n\
 \
 ";
 //==============================================================================

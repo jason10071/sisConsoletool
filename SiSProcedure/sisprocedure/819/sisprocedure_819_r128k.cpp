@@ -284,6 +284,82 @@ SiSProcedure_819_r128k::readFWSizeType(ReferenceSource rs, int chipIndex, bool i
     return fwSizeType;
 }
 
+SerialData*
+SiSProcedure_819_r128k::readProductID(ReferenceSource rs, int chipIndex)
+{
+    SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "readProductID() : rs=%d, chipIndex=%d", (int) rs, chipIndex);
+
+    /* prepare */
+    string keyFaProductID;
+    IAttributeReader* attributeReader = 0;
+
+    switch (rs) {
+    case RS_XRAM:
+        keyFaProductID = KEY_FA_PRODUCT_ID_IN_124K_XRAM;
+        attributeReader = generateAttributeReader();
+        break;
+    case RS_BIN:
+        keyFaProductID = KEY_FA_PRODUCT_ID_IN_FW_ROM;
+        attributeReader = generateAttributeReader( getBinWrap(chipIndex) );
+        break;
+    case RS_ROM:
+    default:
+        std::string msg = EXCEPTION_TITLE;
+        char errorMsg[1024] = "";
+        sprintf(errorMsg, "readProductID() : not support ReferenceSource %d (%s)", (int) rs, ISiSProcedure::getRSStr(rs).c_str());
+        msg.append(errorMsg);
+        throw SPException( msg );
+        break;
+    }
+    attributeReader->setCtlReportToOs( this->m_ctlReportToOsFlag );
+    attributeReader->setChipIndex(chipIndex);
+
+    /* read ProductID */
+    unsigned char* dataBuf = 0;
+    int dataSize = 0;
+    attributeReader->readAttribute( keyFaProductID, dataBuf, dataSize );
+
+    /* check if address table error */
+    IAttributeReader::checkDataSize(EXPECT_SIZE_FA_PRODUCT_ID_IN_124K_XRAM, dataSize);
+
+    /* judge */
+    unsigned char* productID = new unsigned char[dataSize];
+    memset( productID, 0x0, dataSize * sizeof(unsigned char) );
+
+    for(int i = 0; i < dataSize; i++)
+    {
+        productID[i] = dataBuf[i];
+    }
+
+    /* print data */
+    if( SiSLog::getOwnerSiS()->isLOG_D() )
+    {
+        SIS_LOG_D(SiSLog::getOwnerSiS(), TAG,
+                  "read %s (%s) ProductID : ",
+                  ISiSProcedure::getCIStr(chipIndex).c_str(),
+                  ISiSProcedure::getRSStr(rs).c_str());
+
+        std::string dataStr;
+        for(int i = 0; i < dataSize; i++)
+        {
+            char bData[10] = "";
+            sprintf(bData, "%02x ", productID[i]);
+            dataStr.append(bData);
+
+            if( i % 16 == 15 || i == dataSize - 1)
+            {
+                SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "%s", dataStr.c_str());
+                dataStr = "";
+            }
+        }
+    }
+
+    SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "");
+    delete [] dataBuf;
+    delete attributeReader;
+    return new SerialData(productID, dataSize);
+}
+
 FwVersion
 SiSProcedure_819_r128k::readFwVersion(ReferenceSource rs, int chipIndex)
 {
@@ -323,7 +399,7 @@ SiSProcedure_819_r128k::readFwVersion(ReferenceSource rs, int chipIndex)
     IAttributeReader::checkDataSize(EXPECT_SIZE_FA_FW_VERSION_XRAM, dataSize);
 
     /* judge */
-    FwVersion fwVersion;
+    FwVersion fwVersion = {0, 0};
     fwVersion.major = dataBuf[0] & 0xff; // different to 817
     fwVersion.minor = dataBuf[1] & 0xff; // different to 817
 
@@ -437,3 +513,311 @@ void SiSProcedure_819_r128k::writeNoneSiSCmdViaBridge(
 //    }
 //    SISCORE_EXCEPTION_SP_HANDLE
 }
+
+SerialData*
+SiSProcedure_819_r128k::readUpdateMark(ReferenceSource rs, int chipIndex)
+{
+    SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "readUpdateMark() : rs=%d, chipIndex=%d", (int) rs, chipIndex);
+
+    /* prepare */
+    string keyFaUpdateMark;
+    IAttributeReader* attributeReader = 0;
+
+    switch (rs) {
+    case RS_XRAM:
+        keyFaUpdateMark = KEY_FA_UPDATE_MARK_XRAM;
+        attributeReader = generateAttributeReader();
+        break;
+    case RS_BIN:
+        keyFaUpdateMark = KEY_FA_UPDATE_MARK_ROM;
+        attributeReader = generateAttributeReader( getBinWrap(chipIndex) );
+        break;
+    case RS_ROM:
+    default:
+        std::string msg = EXCEPTION_TITLE;
+        char errorMsg[1024] = "";
+        sprintf(errorMsg, "readUpdateMark() : not support ReferenceSource %d (%s)", (int) rs, ISiSProcedure::getRSStr(rs).c_str());
+        msg.append(errorMsg);
+        throw SPException( msg );
+        break;
+    }
+    attributeReader->setCtlReportToOs( this->m_ctlReportToOsFlag );
+    attributeReader->setChipIndex(chipIndex);
+
+    /* read LastUpdateMark */
+    unsigned char* dataBuf = 0;
+    int dataSize = 0;
+    attributeReader->readAttribute( keyFaUpdateMark, dataBuf, dataSize );
+
+    /* check if address table error */
+//    IAttributeReader::checkDataSize(EXPECT_SIZE_FA_LAST_ID_XRAM, dataSize);
+//    IAttributeReader::checkDataSize(EXPECT_SIZE_FA_LAST_ID_XRAM_819, dataSize);
+
+    /* judge */
+    unsigned char* updateMark = new unsigned char[dataSize];
+    memset( updateMark, 0x0, dataSize * sizeof(unsigned char) );
+
+    for(int i = 0; i < dataSize; i++)
+    {
+        updateMark[i] = dataBuf[i];
+    }
+
+    /* print data */
+    if( SiSLog::getOwnerSiS()->isLOG_D() )
+    {
+        SIS_LOG_D(SiSLog::getOwnerSiS(), TAG,
+                  "read %s (%s) LastUpdateMark : ",
+                  ISiSProcedure::getCIStr(chipIndex).c_str(),
+                  ISiSProcedure::getRSStr(rs).c_str());
+
+        std::string dataStr;
+        for(int i = 0; i < dataSize; i++)
+        {
+            char bData[10] = "";
+            sprintf(bData, "%02x ", updateMark[i]);
+            dataStr.append(bData);
+
+            if( i % 16 == 15 || i == dataSize - 1)
+            {
+                SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "%s", dataStr.c_str());
+                dataStr = "";
+            }
+        }
+    }
+
+    SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "");
+    delete [] dataBuf;
+    delete attributeReader;
+    return new SerialData(updateMark, dataSize);
+}
+
+SerialData*
+SiSProcedure_819_r128k::readLastUpdateMark(ReferenceSource rs, int chipIndex)
+{
+    SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "readLastUpdateMark() : rs=%d, chipIndex=%d", (int) rs, chipIndex);
+
+    /* prepare */
+    string keyFaLastUpdateMark;
+    IAttributeReader* attributeReader = 0;
+
+    switch (rs) {
+    case RS_XRAM:
+        keyFaLastUpdateMark = KEY_FA_LAST_UPDATE_MARK_XRAM_819;
+        attributeReader = generateAttributeReader();
+        break;
+    case RS_BIN:
+        keyFaLastUpdateMark = KEY_FA_LAST_UPDATE_MARK_ROM_819;
+        attributeReader = generateAttributeReader( getBinWrap(chipIndex) );
+        break;
+    case RS_ROM:
+    default:
+        std::string msg = EXCEPTION_TITLE;
+        char errorMsg[1024] = "";
+        sprintf(errorMsg, "readLastUpdateMark() : not support ReferenceSource %d (%s)", (int) rs, ISiSProcedure::getRSStr(rs).c_str());
+        msg.append(errorMsg);
+        throw SPException( msg );
+        break;
+    }
+    attributeReader->setCtlReportToOs( this->m_ctlReportToOsFlag );
+    attributeReader->setChipIndex(chipIndex);
+
+    /* read LastUpdateMark */
+    unsigned char* dataBuf = 0;
+    int dataSize = 0;
+    attributeReader->readAttribute( keyFaLastUpdateMark, dataBuf, dataSize );
+
+    /* check if address table error */
+//    IAttributeReader::checkDataSize(EXPECT_SIZE_FA_LAST_ID_XRAM, dataSize);
+//    IAttributeReader::checkDataSize(EXPECT_SIZE_FA_LAST_ID_XRAM_819, dataSize);
+
+    /* judge */
+    unsigned char* lastUpdateMark = new unsigned char[dataSize];
+    memset( lastUpdateMark, 0x0, dataSize * sizeof(unsigned char) );
+
+    for(int i = 0; i < dataSize; i++)
+    {
+        lastUpdateMark[i] = dataBuf[i];
+    }
+
+    /* print data */
+    if( SiSLog::getOwnerSiS()->isLOG_D() )
+    {
+        SIS_LOG_D(SiSLog::getOwnerSiS(), TAG,
+                  "read %s (%s) LastUpdateMark : ",
+                  ISiSProcedure::getCIStr(chipIndex).c_str(),
+                  ISiSProcedure::getRSStr(rs).c_str());
+
+        std::string dataStr;
+        for(int i = 0; i < dataSize; i++)
+        {
+            char bData[10] = "";
+            sprintf(bData, "%02x ", lastUpdateMark[i]);
+            dataStr.append(bData);
+
+            if( i % 16 == 15 || i == dataSize - 1)
+            {
+                SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "%s", dataStr.c_str());
+                dataStr = "";
+            }
+        }
+    }
+
+    SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "");
+    delete [] dataBuf;
+    delete attributeReader;
+    return new SerialData(lastUpdateMark, dataSize);
+}
+
+SerialData*
+SiSProcedure_819_r128k::readPriorLastUpdateMark(ReferenceSource rs, int chipIndex)
+{
+    SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "readPriorLastUpdateMark() : rs=%d, chipIndex=%d", (int) rs, chipIndex);
+
+    /* prepare */
+    string keyFaPriorLastUpdateMark;
+    IAttributeReader* attributeReader = 0;
+
+    switch (rs) {
+    case RS_XRAM:
+        keyFaPriorLastUpdateMark = KEY_FA_PRIOR_LAST_UPDATE_MARK_XRAM_819;
+        attributeReader = generateAttributeReader();
+        break;
+    case RS_BIN:
+        keyFaPriorLastUpdateMark = KEY_FA_PRIOR_LAST_UPDATE_MARK_ROM_819;
+        attributeReader = generateAttributeReader( getBinWrap(chipIndex) );
+        break;
+    case RS_ROM:
+    default:
+        std::string msg = EXCEPTION_TITLE;
+        char errorMsg[1024] = "";
+        sprintf(errorMsg, "readPriorLastUpdateMark() : not support ReferenceSource %d (%s)", (int) rs, ISiSProcedure::getRSStr(rs).c_str());
+        msg.append(errorMsg);
+        throw SPException( msg );
+        break;
+    }
+    attributeReader->setCtlReportToOs( this->m_ctlReportToOsFlag );
+    attributeReader->setChipIndex(chipIndex);
+
+    /* read PriorLastUpdateMark */
+    unsigned char* dataBuf = 0;
+    int dataSize = 0;
+    attributeReader->readAttribute( keyFaPriorLastUpdateMark, dataBuf, dataSize );
+
+    /* check if address table error */
+//    IAttributeReader::checkDataSize(EXPECT_SIZE_FA_LAST_ID_XRAM, dataSize);
+//    IAttributeReader::checkDataSize(EXPECT_SIZE_FA_LAST_ID_XRAM_819, dataSize);
+
+    /* judge */
+    unsigned char* priorLastUpdateMark = new unsigned char[dataSize];
+    memset( priorLastUpdateMark, 0x0, dataSize * sizeof(unsigned char) );
+
+    for(int i = 0; i < dataSize; i++)
+    {
+        priorLastUpdateMark[i] = dataBuf[i];
+    }
+
+    /* print data */
+    if( SiSLog::getOwnerSiS()->isLOG_D() )
+    {
+        SIS_LOG_D(SiSLog::getOwnerSiS(), TAG,
+                  "read %s (%s) PriorLastUpdateMark : ",
+                  ISiSProcedure::getCIStr(chipIndex).c_str(),
+                  ISiSProcedure::getRSStr(rs).c_str());
+
+        std::string dataStr;
+        for(int i = 0; i < dataSize; i++)
+        {
+            char bData[10] = "";
+            sprintf(bData, "%02x ", priorLastUpdateMark[i]);
+            dataStr.append(bData);
+
+            if( i % 16 == 15 || i == dataSize - 1)
+            {
+                SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "%s", dataStr.c_str());
+                dataStr = "";
+            }
+        }
+    }
+
+    SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "");
+    delete [] dataBuf;
+    delete attributeReader;
+    return new SerialData(priorLastUpdateMark, dataSize);
+}
+
+void
+SiSProcedure_819_r128k::writeLastUpdateMark(ReferenceSource rs, int chipIndex, SerialData* serialData)
+{
+    SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "writeLastUpdateMark() : rs=%d, chipIndex=%d", (int) rs, chipIndex);
+
+    /* prepare */
+    string keyFaLastUpdateMark;
+    IAttributeWriter* attributeWriter = 0;
+
+    switch (rs) {
+//    case RS_XRAM:
+//        keyFaLastID = KEY_FA_LAST_ID_XRAM;
+//        attributeWriter = generateAttributeWriter();
+//        break;
+    case RS_BIN:
+        keyFaLastUpdateMark = KEY_FA_LAST_UPDATE_MARK_ROM_819;
+        attributeWriter = generateAttributeWriter( getBinWrap(chipIndex) );
+        break;
+    case RS_XRAM:
+    case RS_ROM:
+    default:
+        std::string msg = EXCEPTION_TITLE;
+        char errorMsg[1024] = "";
+        sprintf(errorMsg, "writeLastUpdateMark() : not support ReferenceSource %d (%s)", (int) rs, ISiSProcedure::getRSStr(rs).c_str());
+        msg.append(errorMsg);
+        throw SPException( msg );
+        break;
+    }
+    attributeWriter->setCtlReportToOs( this->m_ctlReportToOsFlag );
+    attributeWriter->setChipIndex(chipIndex);
+
+    /* write LastUpdateMark */
+    attributeWriter->writeAttribute( keyFaLastUpdateMark, serialData->getData(), serialData->getSize() );
+
+    SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "");
+    delete attributeWriter;
+}
+
+void
+SiSProcedure_819_r128k::writePriorLastUpdateMark(ReferenceSource rs, int chipIndex, SerialData* serialData)
+{
+    SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "writePriorLastUpdateMark() : rs=%d, chipIndex=%d", (int) rs, chipIndex);
+
+    /* prepare */
+    string keyFaPriorLastUpdateMark;
+    IAttributeWriter* attributeWriter = 0;
+
+    switch (rs) {
+//    case RS_XRAM:
+//        keyFaLastID = KEY_FA_LAST_ID_XRAM;
+//        attributeWriter = generateAttributeWriter();
+//        break;
+    case RS_BIN:
+        keyFaPriorLastUpdateMark = KEY_FA_PRIOR_LAST_UPDATE_MARK_ROM_819;
+        attributeWriter = generateAttributeWriter( getBinWrap(chipIndex) );
+        break;
+    case RS_XRAM:
+    case RS_ROM:
+    default:
+        std::string msg = EXCEPTION_TITLE;
+        char errorMsg[1024] = "";
+        sprintf(errorMsg, "writePriorLastUpdateMark() : not support ReferenceSource %d (%s)", (int) rs, ISiSProcedure::getRSStr(rs).c_str());
+        msg.append(errorMsg);
+        throw SPException( msg );
+        break;
+    }
+    attributeWriter->setCtlReportToOs( this->m_ctlReportToOsFlag );
+    attributeWriter->setChipIndex(chipIndex);
+
+    /* write PriorLastUpdateMark */
+    attributeWriter->writeAttribute( keyFaPriorLastUpdateMark, serialData->getData(), serialData->getSize() );
+
+    SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "");
+    delete attributeWriter;
+}
+

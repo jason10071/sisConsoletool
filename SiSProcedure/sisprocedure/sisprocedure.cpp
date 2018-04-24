@@ -268,6 +268,12 @@ SiSProcedure::readPriorLastTime(ReferenceSource rs, int chipIndex)
 }
 
 SerialData*
+SiSProcedure::readProductID(ReferenceSource rs, int chipIndex)
+{
+    return this->m_iSiSProcedure->readProductID(rs, chipIndex);
+}
+
+SerialData*
 SiSProcedure::readTaskID(ReferenceSource rs, int chipIndex)
 {
     return this->m_iSiSProcedure->readTaskID(rs, chipIndex);
@@ -301,6 +307,48 @@ SerialData*
 SiSProcedure::readNoneSiSCmdViaBridge(SerialData * readcommand, size_t len, const int transitionID)
 {
     return this->m_iSiSProcedure->readNoneSiSCmdViaBridge(readcommand, len, transitionID);
+}
+
+SerialData*
+SiSProcedure::readUpdateMark(ReferenceSource rs, int chipIndex)
+{
+    return this->m_iSiSProcedure->readUpdateMark(rs, chipIndex);
+}
+
+SerialData*
+SiSProcedure::readLastUpdateMark(ReferenceSource rs, int chipIndex)
+{
+    return this->m_iSiSProcedure->readLastUpdateMark(rs, chipIndex);
+}
+
+SerialData*
+SiSProcedure::readPriorLastUpdateMark(ReferenceSource rs, int chipIndex)
+{
+    return this->m_iSiSProcedure->readPriorLastUpdateMark(rs, chipIndex);
+}
+
+void
+SiSProcedure::writeUpdateMark(ReferenceSource rs, int chipIndex, SerialData* serialData)
+{
+    this->m_iSiSProcedure->writeUpdateMark(rs, chipIndex, serialData);
+}
+
+void
+SiSProcedure::writeIsUpdateBootloaderInfo(ReferenceSource rs, int chipIndex, SerialData* serialData)
+{
+    this->m_iSiSProcedure->writeIsUpdateBootloaderInfo(rs, chipIndex, serialData);
+}
+
+void
+SiSProcedure::writeLastUpdateMark(ReferenceSource rs, int chipIndex, SerialData* serialData)
+{
+    this->m_iSiSProcedure->writeLastUpdateMark(rs, chipIndex, serialData);
+}
+
+void
+SiSProcedure::writePriorLastUpdateMark(ReferenceSource rs, int chipIndex, SerialData* serialData)
+{
+    this->m_iSiSProcedure->writePriorLastUpdateMark(rs, chipIndex, serialData);
 }
 
 void

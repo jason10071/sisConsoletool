@@ -17,18 +17,45 @@ CTBaseReference::CTBaseReference() :
     m_lastTime(0),
     m_priorLastID(0),
     m_priorLastTime(0),
-    m_taskID(0)
+    m_taskID(0),
+    m_productID(0),
+    m_updateMark(0),
+    m_lastUpdateMark(0),
+    m_priorLastUpdateMark(0)
 {
     /* default init : value 'de' */
-    m_firmwareID = new SerialData(EXPECT_SIZE_FA_FIRMWARE_ID_XRAM);
     m_bootloaderID = new SerialData(EXPECT_SIZE_FA_BOOTLOADER_ID_XRAM);
     m_bootCodeCRC = new SerialData(EXPECT_SIZE_FA_BOOT_CODE_CRC_XRAM);
     m_mainCodeCRC = new SerialData(EXPECT_SIZE_FA_MAIN_CODE_CRC_XRAM);
-    m_lastID = new SerialData(EXPECT_SIZE_FA_LAST_ID_XRAM);
     m_lastTime = new SerialData(EXPECT_SIZE_FA_LAST_TIME_XRAM);
-    m_priorLastID = new SerialData(EXPECT_SIZE_FA_PRIOR_LAST_ID_XRAM);
     m_priorLastTime = new SerialData(EXPECT_SIZE_FA_PRIOR_LAST_TIME_XRAM);
     m_taskID = new SerialData(EXPECT_SIZE_FA_TASK_ID_XRAM);
+    m_productID = new SerialData(EXPECT_SIZE_FA_PRODUCT_ID_IN_124K_XRAM);
+
+    if( this->m_deviceType == DT_817 )
+    {
+        m_firmwareID = new SerialData(EXPECT_SIZE_FA_FIRMWARE_ID_XRAM);
+		m_lastID = new SerialData(EXPECT_SIZE_FA_LAST_ID_XRAM);
+		m_priorLastID = new SerialData(EXPECT_SIZE_FA_PRIOR_LAST_ID_XRAM);
+        m_updateMark = new SerialData(EXPECT_SIZE_FA_UPDATE_MARK_XRAM);
+    }
+    else if( this->m_deviceType == DT_819)
+    {
+        m_firmwareID = new SerialData(EXPECT_SIZE_FA_FIRMWARE_ID_XRAM_819);
+		m_lastID = new SerialData(EXPECT_SIZE_FA_LAST_ID_XRAM_819);
+		m_priorLastID = new SerialData(EXPECT_SIZE_FA_PRIOR_LAST_ID_XRAM_819);
+        m_updateMark = new SerialData(EXPECT_SIZE_FA_UPDATE_MARK_XRAM_819);
+    }
+	else
+	{
+		m_firmwareID = new SerialData(EXPECT_SIZE_FA_FIRMWARE_ID_XRAM_819);
+		m_lastID = new SerialData(EXPECT_SIZE_FA_LAST_ID_XRAM_819);
+		m_priorLastID = new SerialData(EXPECT_SIZE_FA_PRIOR_LAST_ID_XRAM_819);
+        m_updateMark = new SerialData(EXPECT_SIZE_FA_UPDATE_MARK_XRAM_819);
+	}
+
+    m_lastUpdateMark = new SerialData(EXPECT_SIZE_FA_LAST_UPDATE_MARK_XRAM_819);
+    m_priorLastUpdateMark = new SerialData(EXPECT_SIZE_FA_PRIOR_LAST_UPDATE_MARK_XRAM_819);
 
     /* default init : Fw version */
     m_fwVersion.major = 0;
@@ -46,6 +73,11 @@ CTBaseReference::~CTBaseReference()
     if( this->m_priorLastID != 0 ) { delete this->m_priorLastID; }
     if( this->m_priorLastTime != 0 ) { delete this->m_priorLastTime; }
     if( this->m_taskID != 0 ) { delete this->m_taskID; }
+    if( this->m_productID != 0 ) { delete this->m_productID; }    
+    if( this->m_updateMark != 0 ) { delete this->m_updateMark; }
+    if( this->m_lastUpdateMark != 0 ) { delete this->m_lastUpdateMark; }
+    if( this->m_priorLastUpdateMark != 0 ) { delete this->m_priorLastUpdateMark; }
+
 }
 
 bool
@@ -70,7 +102,7 @@ CTBaseReference::isDummy()
     else if( this->m_deviceType == DT_819 )
     {
         /* 819 */
-        if( this->m_interfaceID == INTERFACE_ID_I2C || this->m_interfaceID == INTERFACE_ID_USB || this->m_interfaceID == INTERFACE_ID_SPI_819 )
+        if( this->m_interfaceID == INTERFACE_ID_I2C || this->m_interfaceID == INTERFACE_ID_USB || this->m_interfaceID == INTERFACE_ID_SPI_819 || this->m_interfaceID == INTERFACE_ID_USB_I2C_819 )
         {
             return false;
         }
@@ -191,10 +223,62 @@ CTBaseReference::getFwVersion()
     return this->m_fwVersion;
 }
 
+SerialData*
+CTBaseReference::getProductID()
+{
+    return this->m_productID;
+}
+
+SerialData*
+CTBaseReference::getUpdateMark()
+{
+    return this->m_updateMark;
+}
+
+SerialData*
+CTBaseReference::getLastUpdateMark()
+{
+    return this->m_lastUpdateMark;
+}
+
+SerialData*
+CTBaseReference::getPriorLastUpdateMark()
+{
+    return this->m_priorLastUpdateMark;
+}
+
 void
 CTBaseReference::setDeviceType(DeviceType deviceType)
 {
     this->m_deviceType = deviceType;
+
+	/* delete */
+	if( this->m_firmwareID != 0 ) { delete this->m_firmwareID; }
+	if( this->m_lastID != 0 ) { delete this->m_lastID; }
+	if( this->m_priorLastID != 0 ) { delete this->m_priorLastID; }
+	if( this->m_updateMark != 0 ) { delete this->m_updateMark; }
+
+	if( this->m_deviceType == DT_817 )
+    {
+        m_firmwareID = new SerialData(EXPECT_SIZE_FA_FIRMWARE_ID_XRAM);
+		m_lastID = new SerialData(EXPECT_SIZE_FA_LAST_ID_XRAM);
+		m_priorLastID = new SerialData(EXPECT_SIZE_FA_PRIOR_LAST_ID_XRAM);
+        m_updateMark = new SerialData(EXPECT_SIZE_FA_UPDATE_MARK_XRAM);
+    }
+    else if( this->m_deviceType == DT_819)
+    {
+        m_firmwareID = new SerialData(EXPECT_SIZE_FA_FIRMWARE_ID_XRAM_819);
+		m_lastID = new SerialData(EXPECT_SIZE_FA_LAST_ID_XRAM_819);
+		m_priorLastID = new SerialData(EXPECT_SIZE_FA_PRIOR_LAST_ID_XRAM_819);
+        m_updateMark = new SerialData(EXPECT_SIZE_FA_UPDATE_MARK_XRAM_819);
+    }
+	else
+	{
+		m_firmwareID = new SerialData(EXPECT_SIZE_FA_FIRMWARE_ID_XRAM_819);
+		m_lastID = new SerialData(EXPECT_SIZE_FA_LAST_ID_XRAM_819);
+		m_priorLastID = new SerialData(EXPECT_SIZE_FA_PRIOR_LAST_ID_XRAM_819);
+        m_updateMark = new SerialData(EXPECT_SIZE_FA_UPDATE_MARK_XRAM_819);
+	}
 }
 
 void
@@ -311,3 +395,26 @@ CTBaseReference::setFwVersion(FwVersion fwVersion)
     this->m_fwVersion = fwVersion;
 }
 
+void
+CTBaseReference::setProductID(SerialData* productID)
+{
+    this->m_productID = productID;
+}
+
+void
+CTBaseReference::setUpdateMark(SerialData* updateMark)
+{
+    this->m_updateMark = updateMark;
+}
+
+void
+CTBaseReference::setLastUpdateMark(SerialData* lastUpdateMark)
+{
+    this->m_lastUpdateMark = lastUpdateMark;
+}
+
+void
+CTBaseReference::setPriorLastUpdateMark(SerialData* priorLastUpdateMark)
+{
+    this->m_priorLastUpdateMark = priorLastUpdateMark;
+}

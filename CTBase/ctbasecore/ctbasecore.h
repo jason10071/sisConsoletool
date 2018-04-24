@@ -55,8 +55,12 @@ protected:
     void fetchLastTime(ReferenceSource rs, int chipIndex);
     void fetchPriorLastID(ReferenceSource rs, int chipIndex);
     void fetchPriorLastTime(ReferenceSource rs, int chipIndex);
+    void fetchProductID(ReferenceSource rs, int chipIndex);
     void fetchTaskID(ReferenceSource rs, int chipIndex);
     void fetchFwVersion(ReferenceSource rs, int chipIndex);
+    void fetchUpdateMark(ReferenceSource rs, int chipIndex);
+    void fetchLastUpdateMark(ReferenceSource rs, int chipIndex);
+    void fetchPriorLastUpdateMark(ReferenceSource rs, int chipIndex);
 
     void showDeviceType(int chipIndex, ReferenceSource rs = RS_COUNT);
     void showBroken(int chipIndex, ReferenceSource rs = RS_COUNT);
@@ -73,6 +77,10 @@ protected:
     void showLastTime(int chipIndex, ReferenceSource rs = RS_COUNT);
     void showPriorLastID(int chipIndex, ReferenceSource rs = RS_COUNT);
     void showPriorLastTime(int chipIndex, ReferenceSource rs = RS_COUNT);
+    void showProductID(int chipIndex, ReferenceSource rs = RS_COUNT);
+    void showUpdateMark(int chipIndex, ReferenceSource rs = RS_COUNT);
+    void showLastUpdateMark(int chipIndex, ReferenceSource rs = RS_COUNT);
+    void showPriorLastUpdateMark(int chipIndex, ReferenceSource rs = RS_COUNT);
 
 protected:
     CTBaseParameter* m_ctBaseParameter;

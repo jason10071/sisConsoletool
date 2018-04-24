@@ -15,7 +15,17 @@ public:
     //virtual CTExitCode exec();
 
 protected:
+    virtual void showMasterInfo();
+    virtual void prepareBinMasterRef();
+    virtual void prepareXramMasterRef();
+    virtual void showSlaveInfo(int chipIndex);
+    virtual void prepareBinSlaveRef(int chipIndex);
+    virtual void prepareXramSlaveRef(int chipIndex);
+
     virtual void modifyUpdateStamp(int chipIndex);
+
+    virtual void checkMasterBinProductID();
+    virtual void checkAllBinProductID();
 
     virtual bool ifNeedRestructureBootloader();
     virtual bool ifNeedRestructureBootloader(int chipIndex);

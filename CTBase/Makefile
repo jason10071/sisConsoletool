@@ -6,7 +6,7 @@ CXX      ?= g++
 CFLAGS   += -g -Wall -fexceptions
 CXXFLAGS = $(CFLAGS) -Weffc++ -fexceptions
 LIBS     = -lm
-INCPATH  = -I. -I../SiSLog -I../SiSExpressionLib -I../SiSDeviceIO -I../SiSProcedure -I./getFirmwareId -I./updateFW 
+INCPATH  = -I. -I../SiSLog -I../SiSExpressionLib -I../SiSDeviceIO -I../SiSProcedure -I./getFirmwareId -I./updateFW -I./getFirmwareInfo
 DIR      = $(shell pwd)
 BASENAME = $(shell basename $(DIR))
 

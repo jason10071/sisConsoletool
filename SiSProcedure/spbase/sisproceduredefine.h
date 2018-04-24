@@ -14,6 +14,7 @@
 #define INTERFACE_ID_I2C            0x1
 #define INTERFACE_ID_USB            0x2
 #define INTERFACE_ID_SPI_819        0x3
+#define INTERFACE_ID_USB_I2C_819    0x4
 #define INTERFACE_ID_DUMMY_817      0x3
 #define INTERFACE_ID_DUMMY_819      0xdd
 
@@ -44,11 +45,6 @@ typedef int ChipIndexKey;
 
 struct FwVersion
 {
-    FwVersion() :
-        major(0),
-        minor(0)
-    {}
-
     int major;
     int minor;
 };

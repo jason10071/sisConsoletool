@@ -51,13 +51,17 @@ UpdateFWCore_generalSingle::exec()
     SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "");
 
     /* modify Update Stamp */
-    modifyUpdateStamp(chipIndex);
+    if( !m_updateFWParameter->getDisableStamp() )
+    {
+        modifyUpdateStamp(chipIndex);
+    }
 
     /* check */
     checkAllBinSize();
     checkAllBinDeviceType();
     checkAllBinInterfaceID();
     checkAllBinSelectiveID();
+    checkAllBinProductID();
     SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "");
 
     /* confirm update */

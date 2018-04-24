@@ -3,11 +3,11 @@
 ###############################################################################
 CC       ?= gcc
 CXX      ?= g++
-DEFINES  = -DAPP_VERSION=\"1.5.3.206\"
+DEFINES  = -DAPP_VERSION=\"1.5.6.328\"
 CFLAGS   += -g -Wall $(DEFINES) -pthread -fexceptions
 CXXFLAGS = $(CFLAGS) -Weffc++ $(DEFINES) -pthread -fexceptions
 LIBS     = -lm -lCTBase -lSiSProcedure -lSiSLog -lSiSExpressionLib -lSiSDeviceIO -L../lib -static
-INCPATH  = -I. -I../SiSLog -I../SiSExpressionLib -I../SiSDeviceIO -I../SiSProcedure -I../CTBase -I../CTBase/getFirmwareId -I../CTBase/updateFW 
+INCPATH  = -I. -I../SiSLog -I../SiSExpressionLib -I../SiSDeviceIO -I../SiSProcedure -I../CTBase -I../CTBase/getFirmwareId -I../CTBase/updateFW -I../CTBase/getFirmwareInfo
 DIR      = $(shell pwd)
 
 ###############################################################################

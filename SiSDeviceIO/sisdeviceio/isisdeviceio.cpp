@@ -342,19 +342,36 @@ ISiSDeviceIO::ioCommand(int cmd, unsigned char * buf, int writeSize, int readSiz
     /* read */
     if( readSize > 0 )
     {
-        buf[ getReportIdIndex(false) ] = getReportId(readSize);
-	
-        SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "readData : (readSize=%d)", readSize);
-
-        ret = readData(buf, readSize, 0 );
-        SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "readData done. ret : %d", ret );
-
-        printBuffer( buf, ret );
-
-        if(ret < 0)
+        unsigned char expectReportId = getReportId(readSize, false);
+		
+        for(int i = 0; i < 3000; i++)
         {
-            SIS_LOG_E(SiSLog::getOwnerSiS(), TAG, "readData error, errno=%d (%s)", errno, strerror(errno));
-            return ret;
+            buf[ getReportIdIndex(false) ] = expectReportId;
+	
+            SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "readData : (readSize=%d)", readSize);
+
+            ret = readData(buf, readSize, 0 );
+            SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "readData done. ret : %d", ret );
+
+            printBuffer( buf, ret );
+
+            if(ret < 0)
+            {
+                SIS_LOG_E(SiSLog::getOwnerSiS(), TAG, "readData error, errno=%d (%s)", errno, strerror(errno));
+                return ret;
+            }
+            else
+            {
+               if( buf[ getReportIdIndex(false) ] == expectReportId )
+               {
+                   break;
+               }
+               else
+               {
+                   usleep(10 * 1000);
+                   continue;
+               }
+            }
         }
     }
     else

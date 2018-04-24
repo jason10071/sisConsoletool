@@ -358,6 +358,12 @@ CTBaseCore::fetchPriorLastTime(ReferenceSource rs, int chipIndex)
 }
 
 void
+CTBaseCore::fetchProductID(ReferenceSource rs, int chipIndex)
+{
+    getCTBaseReference(rs, chipIndex)->setProductID( m_sisProcedure->readProductID(rs, chipIndex) );
+}
+
+void
 CTBaseCore::fetchTaskID(ReferenceSource rs, int chipIndex)
 {
     getCTBaseReference(rs, chipIndex)->setTaskID( m_sisProcedure->readTaskID(rs, chipIndex) );
@@ -367,6 +373,24 @@ void
 CTBaseCore::fetchFwVersion(ReferenceSource rs, int chipIndex)
 {
     getCTBaseReference(rs, chipIndex)->setFwVersion( m_sisProcedure->readFwVersion(rs, chipIndex) );
+}
+
+void
+CTBaseCore::fetchUpdateMark(ReferenceSource rs, int chipIndex)
+{
+    getCTBaseReference(rs, chipIndex)->setUpdateMark( m_sisProcedure->readUpdateMark(rs, chipIndex) );
+}
+
+void
+CTBaseCore::fetchLastUpdateMark(ReferenceSource rs, int chipIndex)
+{
+    getCTBaseReference(rs, chipIndex)->setLastUpdateMark( m_sisProcedure->readLastUpdateMark(rs, chipIndex) );
+}
+
+void
+CTBaseCore::fetchPriorLastUpdateMark(ReferenceSource rs, int chipIndex)
+{
+    getCTBaseReference(rs, chipIndex)->setPriorLastUpdateMark( m_sisProcedure->readPriorLastUpdateMark(rs, chipIndex) );
 }
 
 void
@@ -742,6 +766,107 @@ CTBaseCore::showPriorLastTime(int chipIndex, ReferenceSource rs)
                   getCTBaseReference(RS_BIN, chipIndex)->getPriorLastTime()->getSerial().c_str(),
                   ISiSProcedure::getRSStr(RS_XRAM).c_str(),
                   getCTBaseReference(RS_XRAM, chipIndex)->getPriorLastTime()->getSerial().c_str() );
+        break;
+    }
+}
+
+void
+CTBaseCore::showProductID(int chipIndex, ReferenceSource rs)
+{
+    switch (rs)
+    {
+    case RS_BIN:
+    case RS_ROM:
+    case RS_XRAM:
+        SIS_LOG_I(SiSLog::getOwnerSiS(), TAG,
+                  "ProductID : %s (%s)",
+                  ISiSProcedure::getRSStr(rs).c_str(),
+                  getCTBaseReference(rs, chipIndex)->getProductID()->getSerial().c_str() );
+        break;
+    case RS_COUNT:
+    default:
+        SIS_LOG_I(SiSLog::getOwnerSiS(), TAG,
+                  "ProductID :\n\t%s  (%s),\n\t%s (%s)",
+                  ISiSProcedure::getRSStr(RS_BIN).c_str(),
+                  getCTBaseReference(RS_BIN, chipIndex)->getProductID()->getSerial().c_str(),
+                  ISiSProcedure::getRSStr(RS_XRAM).c_str(),
+                  getCTBaseReference(RS_XRAM, chipIndex)->getProductID()->getSerial().c_str() );
+        break;
+    }
+}
+
+void
+CTBaseCore::showUpdateMark(int chipIndex, ReferenceSource rs)
+{
+    switch (rs)
+    {
+    case RS_BIN:
+    case RS_ROM:
+    case RS_XRAM:
+        SIS_LOG_I(SiSLog::getOwnerSiS(), TAG,
+                  "UpdateMark : %s (%s)",
+                  ISiSProcedure::getRSStr(rs).c_str(),
+                  getCTBaseReference(rs, chipIndex)->getUpdateMark()->getSerial().c_str() );
+        break;
+    case RS_COUNT:
+    default:
+        SIS_LOG_I(SiSLog::getOwnerSiS(), TAG,
+                  "UpdateMark :\n\t%s  (%s),\n\t%s (%s)",
+                  ISiSProcedure::getRSStr(RS_BIN).c_str(),
+                  getCTBaseReference(RS_BIN, chipIndex)->getUpdateMark()->getSerial().c_str(),
+                  ISiSProcedure::getRSStr(RS_XRAM).c_str(),
+                  getCTBaseReference(RS_XRAM, chipIndex)->getUpdateMark()->getSerial().c_str() );
+        break;
+    }
+}
+
+
+void
+CTBaseCore::showLastUpdateMark(int chipIndex, ReferenceSource rs)
+{
+    switch (rs)
+    {
+    case RS_BIN:
+    case RS_ROM:
+    case RS_XRAM:
+        SIS_LOG_I(SiSLog::getOwnerSiS(), TAG,
+                  "LastUpdateMark : %s (%s)",
+                  ISiSProcedure::getRSStr(rs).c_str(),
+                  getCTBaseReference(rs, chipIndex)->getLastUpdateMark()->getSerial().c_str() );
+        break;
+    case RS_COUNT:
+    default:
+        SIS_LOG_I(SiSLog::getOwnerSiS(), TAG,
+                  "LastUpdateMark :\n\t%s  (%s),\n\t%s (%s)",
+                  ISiSProcedure::getRSStr(RS_BIN).c_str(),
+                  getCTBaseReference(RS_BIN, chipIndex)->getLastUpdateMark()->getSerial().c_str(),
+                  ISiSProcedure::getRSStr(RS_XRAM).c_str(),
+                  getCTBaseReference(RS_XRAM, chipIndex)->getLastUpdateMark()->getSerial().c_str() );
+        break;
+    }
+}
+
+void
+CTBaseCore::showPriorLastUpdateMark(int chipIndex, ReferenceSource rs)
+{
+    switch (rs)
+    {
+    case RS_BIN:
+    case RS_ROM:
+    case RS_XRAM:
+        SIS_LOG_I(SiSLog::getOwnerSiS(), TAG,
+                  "PriorLastUpdateMark : %s (%s)",
+                  ISiSProcedure::getRSStr(rs).c_str(),
+                  getCTBaseReference(rs, chipIndex)->getPriorLastUpdateMark()->getSerial().c_str() );
+        break;
+    case RS_COUNT:
+    default:
+        SIS_LOG_I(SiSLog::getOwnerSiS(), TAG,
+                  "PriorLastUpdateMark :\n\t%s  (%s),\n\t%s (%s)",
+                  ISiSProcedure::getRSStr(RS_BIN).c_str(),
+                  getCTBaseReference(RS_BIN, chipIndex)->getPriorLastUpdateMark()->getSerial().c_str(),
+                  ISiSProcedure::getRSStr(RS_XRAM).c_str(),
+                  getCTBaseReference(RS_XRAM, chipIndex)->getPriorLastUpdateMark()->getSerial().c_str() );
         break;
     }
 }

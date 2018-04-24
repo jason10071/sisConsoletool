@@ -21,11 +21,13 @@ UpdateFWParameter::UpdateFWParameter() :
     m_updateRegmem(false),
     m_forceUpdate(false),
     m_disableSoftReset(false),
+    m_disableStamp(false),
     m_jumpCheckAll(false),
     m_jumpCheckBinSize(false),
     m_jumpCheckDeviceType(false),
     m_jumpCheckInterfaceID(false),
     m_jumpCheckSelectiveID(false),
+    m_jumpCheckProductID(false),
     m_confirmUpdate(false),
     m_blockRetry(-1),
     m_allRetry(-1),
@@ -60,6 +62,9 @@ UpdateFWParameter::showHelp()
     SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "%s", ARG_DISABLE_SOFT_RESET.c_str() );
     SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "\t#disable softreset after update done. (note: only support non-broken FW)\n" );
 
+    SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "%s", ARG_DISABLE_STAMP.c_str() );
+    SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "\t#disable update mark\n" );
+
     SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "%s", ARG_JUMP_CHECK_ALL.c_str() );
     SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "\t#jump check all\n" );
 
@@ -74,6 +79,9 @@ UpdateFWParameter::showHelp()
 
     SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "%s", ARG_JUMP_CHECK_SELECTIVE_ID.c_str() );
     SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "\t#jump check selectiveID\n" );
+
+    SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "%s", ARG_JUMP_CHECK_PRODUCT_ID.c_str() );
+    SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "\t#jump check productID (different to PID)\n" );
 
     SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "%s", ARG_CONFIRM_UPDATE.c_str() );
     SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "\t#confirm update\n" );
@@ -134,6 +142,11 @@ UpdateFWParameter::isLegalArgument(ArgumentExpression* argumentExpression)
     {
         return true;
     }
+    else if( argumentExpression->getName().compare( ARG_DISABLE_STAMP ) == 0 &&
+             argumentExpression->getAttribute() == ArgumentExpression::ARGUMENT_BOOL )
+    {
+        return true;
+    }
     else if( argumentExpression->getName().compare( ARG_JUMP_CHECK_ALL ) == 0 &&
              argumentExpression->getAttribute() == ArgumentExpression::ARGUMENT_BOOL )
     {
@@ -155,6 +168,11 @@ UpdateFWParameter::isLegalArgument(ArgumentExpression* argumentExpression)
         return true;
     }
     else if( argumentExpression->getName().compare( ARG_JUMP_CHECK_SELECTIVE_ID ) == 0 &&
+             argumentExpression->getAttribute() == ArgumentExpression::ARGUMENT_BOOL )
+    {
+        return true;
+    }
+    else if( argumentExpression->getName().compare( ARG_JUMP_CHECK_PRODUCT_ID ) == 0 &&
              argumentExpression->getAttribute() == ArgumentExpression::ARGUMENT_BOOL )
     {
         return true;
@@ -275,6 +293,20 @@ UpdateFWParameter::setArgument(ArgumentExpression* argumentExpression)
             }
             return true;
         }
+        else if( argumentExpression->getName().compare( ARG_DISABLE_STAMP ) == 0 )
+        {
+            if( argumentExpression->getValueToBool() )
+            {
+                this->m_disableStamp = true;
+                SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "set disableUpdateMark : true");
+            }
+            else
+            {
+                this->m_disableStamp = false;
+                SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "set disableUpdateMark : false");
+            }
+            return true;
+        }
         else if( argumentExpression->getName().compare( ARG_JUMP_CHECK_ALL ) == 0 )
         {
             if( argumentExpression->getValueToBool() )
@@ -342,6 +374,20 @@ UpdateFWParameter::setArgument(ArgumentExpression* argumentExpression)
             {
                 this->m_jumpCheckSelectiveID = false;
                 SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "set jumpCheckSelectiveID : false");
+            }
+            return true;
+        }
+        else if( argumentExpression->getName().compare( ARG_JUMP_CHECK_PRODUCT_ID ) == 0 )
+        {
+            if( argumentExpression->getValueToBool() )
+            {
+                this->m_jumpCheckProductID = true;
+                SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "set jumpCheckProductID : true");
+            }
+            else
+            {
+                this->m_jumpCheckProductID = false;
+                SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "set jumpCheckProductID : false");
             }
             return true;
         }
@@ -489,6 +535,12 @@ UpdateFWParameter::getDisableSoftReset()
 }
 
 bool
+UpdateFWParameter::getDisableStamp()
+{
+    return this->m_disableStamp;
+}
+
+bool
 UpdateFWParameter::getJumpCheckAll()
 {
     return this->m_jumpCheckAll;
@@ -516,6 +568,12 @@ bool
 UpdateFWParameter::getJumpCheckSelectiveID()
 {
     return this->m_jumpCheckSelectiveID;
+}
+
+bool
+UpdateFWParameter::getJumpCheckProductID()
+{
+    return this->m_jumpCheckProductID;
 }
 
 bool
@@ -579,6 +637,12 @@ UpdateFWParameter::setDisableSoftReset(bool disableSoftReset)
 }
 
 void
+UpdateFWParameter::setDisableStamp(bool disableStamp)
+{
+    this->m_disableStamp = disableStamp;
+}
+
+void
 UpdateFWParameter::setJumpCheckAll(bool jumpCheckAll)
 {
     this->m_jumpCheckAll = jumpCheckAll;
@@ -606,6 +670,12 @@ void
 UpdateFWParameter::setJumpCheckSelectiveID(bool jumpCheckSelectiveID)
 {
     this->m_jumpCheckSelectiveID = jumpCheckSelectiveID;
+}
+
+void
+UpdateFWParameter::setJumpCheckProductID(bool jumpCheckProductID)
+{
+    this->m_jumpCheckProductID = jumpCheckProductID;
 }
 
 void

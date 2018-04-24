@@ -477,7 +477,7 @@ CTBaseParameter::setArgument(ArgumentExpression* argumentExpression)
     return false;
 }
 
- bool
+bool
 CTBaseParameter::hasArgumentConflict()
 {
     /* no conflict */

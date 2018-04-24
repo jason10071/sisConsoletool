@@ -54,13 +54,17 @@ UpdateFWCore_general::exec()
     checkAllBinDeviceType();
     checkAllBinInterfaceID();
     checkAllBinSelectiveID();
+    checkMasterBinProductID();
     SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "");
 
     /* confirm update */
     confirmUpdate();
 
     /* modify Update Stamp */
-    modifyUpdateStamp(CI_MASTER);
+    if( !m_updateFWParameter->getDisableStamp() )
+    {
+        modifyUpdateStamp(CI_MASTER);
+    }
 
     /* MasterRecovery if need */
     if( ifNeedMasterRecovery() )
@@ -92,12 +96,18 @@ UpdateFWCore_general::exec()
     {
         showInfo(chipIndex);
     }
+
+    /* check */
+    checkAllBinProductID();
     SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "");
 
     /* modify Update Stamp */
-    for(int chipIndex = CI_SLAVE_0; chipIndex < m_updateFWParameter->getBinWrapMap().size(); chipIndex++)
+    if( !m_updateFWParameter->getDisableStamp() )
     {
-        modifyUpdateStamp(chipIndex);
+        for(int chipIndex = CI_SLAVE_0; chipIndex < m_updateFWParameter->getBinWrapMap().size(); chipIndex++)
+        {
+            modifyUpdateStamp(chipIndex);
+        }
     }
 
     /* RestructureBootloader if need */
@@ -245,14 +255,7 @@ UpdateFWCore_general::prepareXramMasterRef()
         fetchSlaveNum(RS_XRAM); /* 5. SlaveNum */
         fetchMultiChipSelectiveID(RS_XRAM, CI_MASTER); /* 6. MultiChipSelectiveID */
         fetchCalibrationFlag(RS_XRAM, CI_MASTER); /* 7. CalibrationFlag */
-        fetchFirmwareID(RS_XRAM, CI_MASTER); /* 8. FirmwareID */
-        fetchBootloaderID(RS_XRAM, CI_MASTER); /* 9. BootloaderID */
-        fetchBootCodeCRC(RS_XRAM, CI_MASTER); /* 10. BootCodeCRC */
         fetchMainCodeCRC(RS_XRAM, CI_MASTER); /* 11. MainCodeCRC */
-        fetchLastID(RS_XRAM, CI_MASTER); /* 12. LastID */
-        fetchLastTime(RS_XRAM, CI_MASTER); /* 13. LastTime */
-        fetchPriorLastID(RS_XRAM, CI_MASTER); /* 14. PriorLastID */
-        fetchPriorLastTime(RS_XRAM, CI_MASTER); /* 15. PriorLastTime */
     }
     else
     {
@@ -269,8 +272,19 @@ UpdateFWCore_general::prepareXramMasterRef()
         {
             xramMasterRef->setSlaveNum( getUpdateFWReference(RS_BIN, CI_MASTER)->getSlaveNum() );
             SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "!!! using (BIN) SlaveNum instead of (XRAM) : %d", xramMasterRef->getSlaveNum());
-        }
+        }  
     }
+
+    /* it needs to be rocorded no matter the fw was broken or not */
+    fetchFirmwareID(RS_XRAM, CI_MASTER); /* 8. FirmwareID */
+    fetchLastID(RS_XRAM, CI_MASTER);/* 12. LastID */
+    fetchLastTime(RS_XRAM, CI_MASTER); /* 13. LastTime */
+    fetchPriorLastID(RS_XRAM, CI_MASTER);/* 14. PriorLastID */
+    fetchPriorLastTime(RS_XRAM, CI_MASTER);/* 15. PriorLastTime */
+
+    /* it is still reliable from boot code */
+    fetchBootloaderID(RS_XRAM, CI_MASTER); /* 9. BootloaderID */
+    fetchBootCodeCRC(RS_XRAM, CI_MASTER); /* 10. BootCodeCRC */
 }
 
 void
@@ -407,21 +421,24 @@ UpdateFWCore_general::prepareXramSlaveRef(int chipIndex)
     if( mainCodeReliable )
     {
         fetchMultiChipSelectiveID(RS_XRAM, chipIndex); /* 6. MultiChipSelectiveID */
-        fetchCalibrationFlag(RS_XRAM, chipIndex); /* 7. CalibrationFlag */
-        fetchFirmwareID(RS_XRAM, chipIndex); /* 8. FirmwareID */
-        fetchBootloaderID(RS_XRAM, chipIndex); /* 9. BootloaderID */
-        fetchBootCodeCRC(RS_XRAM, chipIndex); /* 10. BootCodeCRC */
-        fetchMainCodeCRC(RS_XRAM, chipIndex); /* 11. MainCodeCRC */
-        fetchLastID(RS_XRAM, chipIndex); /* 12. LastID */
-        fetchLastTime(RS_XRAM, chipIndex); /* 13. LastTime */
-        fetchPriorLastID(RS_XRAM, chipIndex); /* 14. PriorLastID */
-        fetchPriorLastTime(RS_XRAM, chipIndex); /* 15. PriorLastTime */
+        fetchCalibrationFlag(RS_XRAM, chipIndex); /* 7. CalibrationFlag */        
+        fetchMainCodeCRC(RS_XRAM, chipIndex); /* 11. MainCodeCRC */        
     }
     else
     {
         SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "!!! MainCode is unreliable");
         /* using bin instead */
     }
+    /* it needs to be rocorded no matter the fw was broken or not */
+    fetchFirmwareID(RS_XRAM, chipIndex); /* 8. FirmwareID */
+    fetchLastID(RS_XRAM, chipIndex);/* 12. LastID */
+    fetchLastTime(RS_XRAM, chipIndex); /* 13. LastTime */
+    fetchPriorLastID(RS_XRAM, chipIndex);/* 14. PriorLastID */
+    fetchPriorLastTime(RS_XRAM, chipIndex);/* 15. PriorLastTime */
+
+    /* it is still reliable from boot code */
+    fetchBootloaderID(RS_XRAM, chipIndex); /* 9. BootloaderID */
+    fetchBootCodeCRC(RS_XRAM, chipIndex); /* 10. BootCodeCRC */
 }
 
 void
@@ -486,13 +503,41 @@ UpdateFWCore_general::modifyUpdateStamp(int chipIndex)
     /* switch SiSProcedure by Bin FWSizeType */
     m_sisProcedure->switchSiSProcedure( binRef->getFWSizeType() );
 
-    m_sisProcedure->writePriorLastID( RS_BIN, chipIndex, xramRef->getFirmwareID() );
-    m_sisProcedure->writePriorLastTime( RS_BIN, chipIndex, xramRef->getLastTime() );
+    /* write update mark */
+    const short updateMarkLength = 4;
+    unsigned char *updateMark = new unsigned char[updateMarkLength-1];
+    updateMark[0] = 0x50;
+    updateMark[1] = 0x38;
+    updateMark[2] = 0x31;
+    updateMark[3] = 0x30;
+    SerialData *updateMarkSerial = new SerialData(updateMark, updateMarkLength);
+    m_sisProcedure->writeUpdateMark( RS_BIN, chipIndex, updateMarkSerial );
 
-    m_sisProcedure->writeLastID( RS_BIN, chipIndex, binRef->getFirmwareID() );
+    /* write update bootloader infomation */
+    const short isUpdateBootloaderInfoLength = 2;
+    unsigned char *isUpdateBootloaderInfo = new unsigned char[isUpdateBootloaderInfoLength-1];
+    if( xramRef->isBroken() || ifNeedUpdateBootloader(chipIndex) || ifNeedRestructureBootloader(chipIndex) )
+    {
+        isUpdateBootloaderInfo[0] = 'u';    //update
+        isUpdateBootloaderInfo[1] = 'b';    //bootloader
+    }
+    else
+    {
+        isUpdateBootloaderInfo[0] = 'n';    //no update
+        isUpdateBootloaderInfo[1] = 'b';    //bootloader
+    }
+    SerialData *isUpdateBootloaderInfoSerial = new SerialData(isUpdateBootloaderInfo, isUpdateBootloaderInfoLength);
+    m_sisProcedure->writeIsUpdateBootloaderInfo( RS_BIN, chipIndex, isUpdateBootloaderInfoSerial );
+
+    /* write last infomation */
+    m_sisProcedure->writeLastID( RS_BIN, chipIndex, xramRef->getFirmwareID() );
     SerialData* now = ISiSProcedure::getTimestamp();
     m_sisProcedure->writeLastTime( RS_BIN, chipIndex, now );
     delete now;
+
+    /* write prior last infomation */
+    m_sisProcedure->writePriorLastID( RS_BIN, chipIndex, xramRef->getLastID() );
+    m_sisProcedure->writePriorLastTime( RS_BIN, chipIndex, xramRef->getLastTime() );
 }
 
 void
@@ -663,7 +708,8 @@ UpdateFWCore_general::checkAllBinInterfaceID()
                 /* Master */                
                 if( m_sisProcedure->readSubProtocol()==DT_BRIDGE )
                 {
-                    if( binInterfaceID == INTERFACE_ID_I2C && osDeviceInterface == DI_HID_USB )
+                    if( osDeviceInterface == DI_HID_USB &&
+                            (binInterfaceID == INTERFACE_ID_I2C || binInterfaceID == INTERFACE_ID_USB_I2C_819) )
                     {
                         /* bridge : bin is I2C, but OS is USB */
                         continue;
@@ -672,7 +718,7 @@ UpdateFWCore_general::checkAllBinInterfaceID()
                     {
                         std::string msg = EXCEPTION_TITLE;
                         char errorMsg[1024] = "";
-                        sprintf(errorMsg, "checkAllBinInterfaceID error ! bridge compare to (OS) confuse %s, %s : 0x%x (I2C:01, USB:02, Dummy:03)",
+                        sprintf(errorMsg, "checkAllBinInterfaceID error ! bridge compare to (OS) %s, %s : 0x%x (I2C:01, USB:02, SPI:03, USB+I2C:04, Dummy:dd)",
                                 ISiSProcedure::getDIStr(osDeviceInterface).c_str(),
                                 ISiSProcedure::getCIStr(chipIndex).c_str(),
                                 binInterfaceID );
@@ -698,7 +744,7 @@ UpdateFWCore_general::checkAllBinInterfaceID()
                     {
                         std::string msg = EXCEPTION_TITLE;
                         char errorMsg[1024] = "";
-                        sprintf(errorMsg, "checkAllBinInterfaceID error ! compare to (OS) %s, %s : 0x%x (I2C:01, USB:02, Dummy:03)",
+                        sprintf(errorMsg, "checkAllBinInterfaceID error ! compare to (OS) %s, %s : 0x%x (I2C:01, USB:02, SPI:03, USB+I2C:04, Dummy:dd)",
                                 ISiSProcedure::getDIStr(osDeviceInterface).c_str(),
                                 ISiSProcedure::getCIStr(chipIndex).c_str(),
                                 binInterfaceID );
@@ -724,11 +770,17 @@ UpdateFWCore_general::checkAllBinInterfaceID()
                         /* SPI*/
                         continue;
                     }
+                    else if( binInterfaceID == INTERFACE_ID_USB_I2C_819 &&
+                             (osDeviceInterface == DI_I2C || osDeviceInterface == DI_HID_I2C || osDeviceInterface == DI_HID_USB) )
+                    {
+                        /* USB+I2C*/
+                        continue;
+                    }
                     else
                     {
                         std::string msg = EXCEPTION_TITLE;
                         char errorMsg[1024] = "";
-                        sprintf(errorMsg, "checkAllBinInterfaceID error ! compare to (OS) %s, %s : 0x%x (I2C:01, USB:02, SPI:03, Dummy:dd)",
+                        sprintf(errorMsg, "checkAllBinInterfaceID error ! compare to (OS) %s, %s : 0x%x (I2C:01, USB:02, SPI:03, USB+I2C:04, Dummy:dd)",
                                 ISiSProcedure::getDIStr(osDeviceInterface).c_str(),
                                 ISiSProcedure::getCIStr(chipIndex).c_str(),
                                 binInterfaceID );
@@ -756,8 +808,8 @@ UpdateFWCore_general::checkAllBinInterfaceID()
                     {
                         std::string msg = EXCEPTION_TITLE;
                         char errorMsg[1024] = "";
-                        sprintf(errorMsg, "checkAllBinInterfaceID error ! compare to I2C, %s : 0x%x (I2C:01, USB:02, Dummy:03)",
-                                ISiSProcedure::getCIStr(chipIndex).c_str(),
+                        sprintf(errorMsg, "checkAllBinInterfaceID error ! compare to (I2C), %s : 0x%x (I2C:01, USB:02, SPI:03, USB+I2C:04, Dummy:dd)",
+                                SiSProcedure::getCIStr(chipIndex).c_str(),
                                 binInterfaceID );
                         msg.append(errorMsg);
                         throw CTException( msg );
@@ -766,7 +818,7 @@ UpdateFWCore_general::checkAllBinInterfaceID()
                     {
                         std::string msg = EXCEPTION_TITLE;
                         char errorMsg[1024] = "";
-                        sprintf(errorMsg, "checkAllBinInterfaceID error ! compare to I2C/SPI, %s : 0x%x (I2C:01, USB:02, SPI:03, Dummy:dd)",
+                        sprintf(errorMsg, "checkAllBinInterfaceID error ! compare to (I2C|SPI), %s : 0x%x (I2C:01, USB:02, SPI:03, USB+I2C:04, Dummy:dd)",
                                 ISiSProcedure::getCIStr(chipIndex).c_str(),
                                 binInterfaceID );
                         msg.append(errorMsg);
@@ -823,6 +875,14 @@ UpdateFWCore_general::checkAllBinSelectiveID()
             {
                 continue;
             }
+            else if( binInterfaceID == INTERFACE_ID_USB_I2C_819 &&
+                     (binSelectiveID == NON_MULTI_DEVICE_FLAG ||
+                      binSelectiveID == MASTER_DEVICE_FLAG ||
+                      binSelectiveID == BRIDGE_DEVICE_FLAG ||
+                      binSelectiveID == NON_MULTI_DEVICE_FLAG) )
+            {
+                continue;
+            }
             else
             {
                 std::string msg = EXCEPTION_TITLE;
@@ -861,6 +921,18 @@ UpdateFWCore_general::checkAllBinSelectiveID()
     }
 
     SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "%s checkAllBinSelectiveID : all match : Yes", SYMBOL_CTL_FLOW);
+}
+
+void
+UpdateFWCore_general::checkMasterBinProductID()
+{
+    // 817 do nothing
+}
+
+void
+UpdateFWCore_general::checkAllBinProductID()
+{
+    // 817 do nothing
 }
 
 bool
@@ -945,22 +1017,6 @@ UpdateFWCore_general::ifNeedUpdateBootloader(int chipIndex)
     if( m_updateFWParameter->getUpdateBootloader() )
     {
         SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "%s : force to update bootloader with -b parameter", ISiSProcedure::getCIStr(chipIndex).c_str());
-        needUpdateBootloader = true;
-    }
-    else if( xramRef->isBroken() || xramRef->isDummy() )
-    {
-        if( !m_updateFWParameter->getUpdateBootloaderAuto() )
-        {
-            std::string msg = EXCEPTION_TITLE;
-            char errorMsg[1024] = "";
-            sprintf(errorMsg, "%s : broken/dummy ! Please update bootloader with -b /-ba parameter",
-                    ISiSProcedure::getCIStr(chipIndex).c_str());
-            msg.append(errorMsg);
-            throw CTException( msg );
-        }
-
-        SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "%s : broken/dummy : Automatically update bootloader with -ba parameter",
-                        ISiSProcedure::getCIStr(chipIndex).c_str());
         needUpdateBootloader = true;
     }
     else if( !m_sisProcedure->compareData(xramRef->getBootloaderID()->getData(), xramRef->getBootloaderID()->getSize(),

@@ -52,17 +52,25 @@ public:
     virtual SerialData* readLastTime(ReferenceSource rs, int chipIndex);
     virtual SerialData* readPriorLastID(ReferenceSource rs, int chipIndex);
     virtual SerialData* readPriorLastTime(ReferenceSource rs, int chipIndex);
+    virtual SerialData* readProductID(ReferenceSource rs, int chipIndex);
     virtual SerialData* readTaskID(ReferenceSource rs, int chipIndex);
     virtual FwVersion readFwVersion(ReferenceSource rs, int chipIndex);
     virtual FWSizeType readRomFWSizeType(int chipIndex);
     virtual SerialData* readXramAttribute(std::string key, int chipIndex);
     virtual SerialData* readXramAddress(unsigned int address, int dataSize, int chipIndex);
 	virtual SerialData* readNoneSiSCmdViaBridge(SerialData * readcommand, const size_t len, const int transitionID);
+    virtual SerialData* readUpdateMark(ReferenceSource rs, int chipIndex);
+    virtual SerialData* readLastUpdateMark(ReferenceSource rs, int chipIndex);
+    virtual SerialData* readPriorLastUpdateMark(ReferenceSource rs, int chipIndex);
 
+    virtual void writeUpdateMark(ReferenceSource rs, int chipIndex, SerialData* serialData);
+    virtual void writeIsUpdateBootloaderInfo(ReferenceSource rs, int chipIndex, SerialData* serialData);
+    virtual void writeLastUpdateMark(ReferenceSource rs, int chipIndex, SerialData* serialData);
+    virtual void writePriorLastUpdateMark(ReferenceSource rs, int chipIndex, SerialData* serialData);
     virtual void writeLastID(ReferenceSource rs, int chipIndex, SerialData* serialData);
     virtual void writeLastTime(ReferenceSource rs, int chipIndex, SerialData* serialData);
     virtual void writePriorLastID(ReferenceSource rs, int chipIndex, SerialData* serialData);
-    virtual void writePriorLastTime(ReferenceSource rs, int chipIndex, SerialData* serialData);
+    virtual void writePriorLastTime(ReferenceSource rs, int chipIndex, SerialData* serialData);    
 	virtual void writeNoneSiSCmdViaBridge( 
 			SerialData * data, const int transitionID);
 

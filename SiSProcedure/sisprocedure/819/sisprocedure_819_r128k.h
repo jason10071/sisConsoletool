@@ -26,11 +26,18 @@ public:
 
     virtual FWSizeType readFWSizeType(ReferenceSource rs, int chipIndex, bool isBroken);
 //    virtual int readSlaveNum(ReferenceSource rs);
+    virtual SerialData* readProductID(ReferenceSource rs, int chipIndex);
     virtual FwVersion readFwVersion(ReferenceSource rs, int chipIndex);
     virtual FWSizeType readRomFWSizeType(int chipIndex);
 	virtual SerialData* readNoneSiSCmdViaBridge(SerialData * readcommand, const size_t len, const int transitionID);
 	virtual void writeNoneSiSCmdViaBridge( 
 			SerialData * data, const int transitionID);
+
+    virtual SerialData* readUpdateMark(ReferenceSource rs, int chipIndex);
+    virtual SerialData* readLastUpdateMark(ReferenceSource rs, int chipIndex);
+    virtual SerialData* readPriorLastUpdateMark(ReferenceSource rs, int chipIndex);
+    virtual void writeLastUpdateMark(ReferenceSource rs, int chipIndex, SerialData* serialData);
+    virtual void writePriorLastUpdateMark(ReferenceSource rs, int chipIndex, SerialData* serialData);
 };
 
 } // Procedure

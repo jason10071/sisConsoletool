@@ -13,6 +13,9 @@
 //#include "UnderlyingDevKey.h"
 //#include "CptFactoryFacade.h"
 
+#include <stdio.h>
+#include <string.h>
+
 using namespace std;
 using namespace SiS::Procedure;
 using namespace SiS;
@@ -1214,6 +1217,18 @@ SiSProcedure_817_r64k::readPriorLastTime(ReferenceSource rs, int chipIndex)
 }
 
 SerialData*
+SiSProcedure_817_r64k::readProductID(ReferenceSource rs, int chipIndex)
+{
+    std::string msg = EXCEPTION_TITLE;
+    char errorMsg[1024] = "";
+    sprintf(errorMsg, "readProductID() : not support");
+    msg.append(errorMsg);
+    throw SPException( msg );
+
+    return 0;
+}
+
+SerialData*
 SiSProcedure_817_r64k::readTaskID(ReferenceSource rs, int chipIndex)
 {
     SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "readTaskID() : rs=%d, chipIndex=%d", (int) rs, chipIndex);
@@ -1328,7 +1343,7 @@ SiSProcedure_817_r64k::readFwVersion(ReferenceSource rs, int chipIndex)
     IAttributeReader::checkDataSize(EXPECT_SIZE_FA_FW_VERSION_XRAM, dataSize);
 
     /* judge */
-    FwVersion fwVersion;
+    FwVersion fwVersion = {0, 0};
     fwVersion.major = dataBuf[1] & 0xff;
     fwVersion.minor = dataBuf[0] & 0x0f;
 
@@ -1467,6 +1482,44 @@ SerialData*SiSProcedure_817_r64k::readNoneSiSCmdViaBridge(SerialData * readcomma
 	sprintf(errorMsg, "readNoneSiSCmdViaBridge() : 817 does not support this function");
 	msg.append(errorMsg);
 	throw SPException( msg );
+}
+
+void
+SiSProcedure_817_r64k::writeUpdateMark(ReferenceSource rs, int chipIndex, SerialData* serialData)
+{
+    SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "writeUpdateMark() : rs=%d, chipIndex=%d", (int) rs, chipIndex);
+
+    /* prepare */
+    string keyFaUpdateMark;
+    IAttributeWriter* attributeWriter = 0;
+
+    switch (rs) {
+//    case RS_XRAM:
+//        keyFaLastID = KEY_FA_LAST_ID_XRAM;
+//        attributeWriter = generateAttributeWriter();
+//        break;
+    case RS_BIN:
+        keyFaUpdateMark = KEY_FA_UPDATE_MARK_ROM;
+        attributeWriter = generateAttributeWriter( getBinWrap(chipIndex) );
+        break;
+    case RS_XRAM:
+    case RS_ROM:
+    default:
+        std::string msg = EXCEPTION_TITLE;
+        char errorMsg[1024] = "";
+        sprintf(errorMsg, "writeUpdateMark() : not support ReferenceSource %d (%s)", (int) rs, ISiSProcedure::getRSStr(rs).c_str());
+        msg.append(errorMsg);
+        throw SPException( msg );
+        break;
+    }
+    attributeWriter->setCtlReportToOs( this->m_ctlReportToOsFlag );
+    attributeWriter->setChipIndex(chipIndex);
+
+    /* write LastID */
+    attributeWriter->writeAttribute( keyFaUpdateMark, serialData->getData(), serialData->getSize() );
+
+    SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "");
+    delete attributeWriter;
 }
 
 void
@@ -1616,6 +1669,44 @@ SiSProcedure_817_r64k::writePriorLastTime(ReferenceSource rs, int chipIndex, Ser
 
     /* write PriorLastTime */
     attributeWriter->writeAttribute( keyFaPriorLastTime, serialData->getData(), serialData->getSize() );
+
+    SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "");
+    delete attributeWriter;
+}
+
+void
+SiSProcedure_817_r64k::writeIsUpdateBootloaderInfo(ReferenceSource rs, int chipIndex, SerialData* serialData)
+{
+    SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "writeIsUpdateBootloaderInfo() : rs=%d, chipIndex=%d", (int) rs, chipIndex);
+
+    /* prepare */
+    string keyFaIsUpdateBootloaderInfo;
+    IAttributeWriter* attributeWriter = 0;
+
+    switch (rs) {
+//    case RS_XRAM:
+//        keyFaPriorLastTime = KEY_FA_PRIOR_LAST_TIME_XRAM;
+//        attributeWriter = generateAttributeWriter();
+//        break;
+    case RS_BIN:
+        keyFaIsUpdateBootloaderInfo = KEY_FA_IS_UPDATE_BOOTLOADER_INFO_ROM;
+        attributeWriter = generateAttributeWriter( getBinWrap(chipIndex) );
+        break;
+    case RS_XRAM:
+    case RS_ROM:
+    default:
+        std::string msg = EXCEPTION_TITLE;
+        char errorMsg[1024] = "";
+        sprintf(errorMsg, "writeIsUpdateBootloaderInfo() : not support ReferenceSource %d (%s)", (int) rs, ISiSProcedure::getRSStr(rs).c_str());
+        msg.append(errorMsg);
+        throw SPException( msg );
+        break;
+    }
+    attributeWriter->setCtlReportToOs( this->m_ctlReportToOsFlag );
+    attributeWriter->setChipIndex(chipIndex);
+
+    /* write IsUpdateBootloader Info */
+    attributeWriter->writeAttribute( keyFaIsUpdateBootloaderInfo, serialData->getData(), serialData->getSize() );
 
     SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "");
     delete attributeWriter;
