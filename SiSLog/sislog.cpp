@@ -206,6 +206,7 @@ SiSLog::getCurrentTimeString()
 const std::string
 SiSLog::getCurrentThreadIDString()
 {
+/*
 #ifdef WIN32
     char threadID[128] = {0};
     sprintf(threadID, "%d", GetCurrentThreadId());
@@ -220,6 +221,8 @@ SiSLog::getCurrentThreadIDString()
 
     return std::string(threadID);
 #endif
+*/
+	return "";
 }
 
 void
@@ -456,7 +459,7 @@ SiSLog::printLog(const char* level, const char* tag, const char* function, const
         fflush(m_logFile);
     }
 
-    delete fmt;
+    delete [] fmt;
 }
 
 void
