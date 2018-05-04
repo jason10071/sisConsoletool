@@ -231,17 +231,22 @@ ISiSDeviceIO::printBuffer( const unsigned char* data, int size )
     int strSize = getMaxBufferSize() * 5;
 
     char * str = new char[strSize];
-    memset( str, 0, sizeof(char) * strSize );
+    memset( str, '\0', sizeof(char) * strSize );
 
     if ( size > 0  && size <= static_cast<int>(getMaxBufferSize()))
     {
 
-        sprintf(str, "%02x", data[0]);
+        printf("tmp static_cast<int>(getMaxBufferSize())=%d\n", static_cast<int>(getMaxBufferSize()));
 
+        sprintf(str, "%02x", data[0]);
+        printf("tmp data[0]=%02x\n", data[0]);
+        
         for( int i = 1; i < size; i++ )
         {
+            printf("tmp data[%d]=%02x\n", i, data[i]);
+            printf("tmp str=%s\n", str);
             sprintf(str, "%s %02x", str, data[i]);
-
+            
         }
 
         if(SiSLog::getOwnerSiS()->isLOG_D())
