@@ -228,52 +228,47 @@ ISiSDeviceIO::printBuffer( const unsigned char* data, int size )
 {
     SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "size = %d", size );
 
-    int strSize = getMaxBufferSize() * 5;
+    //int strSize = getMaxBufferSize() * 5;
 
-    char * str = new char[strSize];
-    memset( str, '\0', sizeof(char) * strSize );
+    std::string str = "";
+
+    char * tmp_c = new char[5];
+    memset( tmp_c, '\0', sizeof(char) * 5 );
 
     if ( size > 0  && size <= static_cast<int>(getMaxBufferSize()))
     {
+        sprintf(tmp_c, "%02x", data[0]);
+        std::string tmp_s(tmp_c);
+        str.append(tmp_s);
 
-        printf("tmp static_cast<int>(getMaxBufferSize())=%d\n", static_cast<int>(getMaxBufferSize()));
-
-        sprintf(str, "%02x", data[0]);
-        printf("tmp data[0]=%02x\n", data[0]);
-        
         for( int i = 1; i < size; i++ )
         {
-            printf("tmp data[%d]=%02x\n", i, data[i]);
-            printf("tmp str=%s\n", str);
-            sprintf(str, "%s %02x", str, data[i]);
-            
+            sprintf(tmp_c, " %02x", data[i]);
+            std::string tmp_s(tmp_c);
+            str.append(tmp_s);
         }
 
-        if(SiSLog::getOwnerSiS()->isLOG_D())
-        {
-            printf("---\n");
-            printf("%s\n", str);
-            printf("---\n");
-        }
-
-        //SIS_LOG_D(SiSLog::getOwnerSiS(), TAG,  "%s", str );
+        SIS_LOG_D(SiSLog::getOwnerSiS(), TAG,  "%s", str.c_str() );
     }
     else if (size > static_cast<int>(getMaxBufferSize()))
     {
-
-        sprintf(str, "%02x", data[0]);
+        sprintf(tmp_c, "%02x", data[0]);
+        std::string tmp_s(tmp_c);
+        str.append(tmp_s);
 
         for( int i = 1; i < static_cast<int>(getMaxBufferSize()); i++ )
         {
-            sprintf(str, "%s %02x", str, data[i]);
+            sprintf(tmp_c, " %02x", data[i]);
+            std::string tmp_s(tmp_c);
+            str.append(tmp_s);
         }
 
         SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "========================Too long return packets=======================" );
         SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "The first %d bytes:", getMaxBufferSize());
-        SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "%s", str );
+        SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "%s", str.c_str() );
     }
 
-    delete [] str;
+    delete [] tmp_c;
 }
 
 void 
