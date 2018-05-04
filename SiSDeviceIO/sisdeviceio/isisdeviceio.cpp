@@ -231,6 +231,7 @@ ISiSDeviceIO::printBuffer( const unsigned char* data, int size )
     int strSize = getMaxBufferSize() * 5;
 
     char * str = new char[strSize];
+    memset( str, 0, sizeof(char) * strSize );
 
     if ( size > 0  && size <= static_cast<int>(getMaxBufferSize()))
     {
@@ -243,7 +244,14 @@ ISiSDeviceIO::printBuffer( const unsigned char* data, int size )
 
         }
 
-        SIS_LOG_D(SiSLog::getOwnerSiS(), TAG,  "%s", str );
+        if(SiSLog::getOwnerSiS()->isLOG_D())
+        {
+            printf("---\n");
+            printf("%s\n", str);
+            printf("---\n");
+        }
+
+        //SIS_LOG_D(SiSLog::getOwnerSiS(), TAG,  "%s", str );
     }
     else if (size > static_cast<int>(getMaxBufferSize()))
     {
@@ -260,7 +268,7 @@ ISiSDeviceIO::printBuffer( const unsigned char* data, int size )
         SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "%s", str );
     }
 
-    delete[] str;
+    delete [] str;
 }
 
 void 
