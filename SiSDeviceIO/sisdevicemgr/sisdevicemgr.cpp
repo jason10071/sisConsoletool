@@ -49,6 +49,11 @@ using namespace SiS;
 
 #define TAG "SiSDeviceMgr"
 
+/* SiS device node name */
+#define SIS_TOUCH_USB_HIDRAW "/dev/sis_touch_usb_hidraw"
+#define SIS_TOUCH_I2C_HIDRAW "/dev/sis_touch_i2c_hidraw"
+//----------------------
+
 SiSDeviceMgr::SiSDeviceMgr() :
     m_openedIndex(0) // default open index 0
 {
@@ -92,6 +97,35 @@ SiSDeviceMgr::getElement(SiSDeviceAttributeList _list, int _i)
         ++it;
     }
     return *it;
+}
+
+bool
+SiSDeviceMgr::detectBySiSDeviceNode(std::string deviceName)
+{
+    if( deviceName.substr(0, deviceName.size()) == SIS_TOUCH_USB_HIDRAW )
+    {
+        SiSDeviceAttribute* newSiSDeviceAttribute = new SiSDeviceAttribute();
+        newSiSDeviceAttribute->setDeviceName( deviceName );
+		newSiSDeviceAttribute->setNodeName(deviceName);
+		newSiSDeviceAttribute->setConnectType( SiSDeviceAttribute::CON_819_USB_HID	);
+
+        m_sisDeviceAttributeList.push_back(newSiSDeviceAttribute);
+        SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "Available sis touch\n");
+        return true;
+    }
+	else if( deviceName.substr(0, deviceName.size()) == SIS_TOUCH_I2C_HIDRAW )
+	{        
+	    SiSDeviceAttribute* newSiSDeviceAttribute = new SiSDeviceAttribute();
+        newSiSDeviceAttribute->setDeviceName( deviceName );
+		newSiSDeviceAttribute->setNodeName(deviceName);
+		newSiSDeviceAttribute->setConnectType( SiSDeviceAttribute::CON_819_HID_OVER_I2C	);
+
+        m_sisDeviceAttributeList.push_back(newSiSDeviceAttribute);
+        SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "Available sis touch\n");
+        return true;
+	}
+
+    return false;
 }
 
 bool

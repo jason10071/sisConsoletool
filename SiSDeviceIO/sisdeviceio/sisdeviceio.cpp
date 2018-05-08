@@ -69,11 +69,11 @@ SiSDeviceIO::shutdown()
 
     m_sisDeviceMgr->clearDeviceAttributeList();
 
-    if(m_iSiSDeviceIO != 0)
-    {
-        delete m_iSiSDeviceIO;
-        m_iSiSDeviceIO = 0;
-    }
+    //if(m_iSiSDeviceIO != 0)
+    //{
+    //    delete m_iSiSDeviceIO;
+    //    m_iSiSDeviceIO = 0;
+    //}
 }
 
 int

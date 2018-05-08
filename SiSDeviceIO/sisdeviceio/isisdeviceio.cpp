@@ -102,7 +102,11 @@ ISiSDeviceIO::setUserConnectType(SiSDeviceAttribute::ConnectType userConnectType
 void 
 ISiSDeviceIO::boot(std::string deviceName)
 {
-    if( m_sisDeviceMgr->detectByHidrawName(deviceName) ) /* detect "/dev/hidraw*" */
+    if( m_sisDeviceMgr->detectBySiSDeviceNode(deviceName) ) /* detect "/dev/sis_*" */
+    {
+
+    }
+    else if( m_sisDeviceMgr->detectByHidrawName(deviceName) ) /* detect "/dev/hidraw*" */
     {
 
     }

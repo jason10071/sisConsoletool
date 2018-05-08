@@ -179,7 +179,7 @@ ISiSProcedure::reOpenDevice(std::string deviceIDOpened, int waitResetSec)
     std::string deviceIDReOpened = "";
 
     /* re-open device */
-    int REOPEN_RETRY_MAX = 30;
+    int REOPEN_RETRY_MAX = 5;
     for(int i = 1; i <= REOPEN_RETRY_MAX; i++)
     {
         /* reset SiSCore */
