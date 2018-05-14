@@ -103,7 +103,12 @@ SiSDeviceIO_819_usb_hid::openDevice()
         throw SiSDeviceException("openDevice, nodeName is empty", -1);
     }
 
-    const char* devName = opened->getNodeName().c_str();
+    //const char* devName = opened->getNodeName().c_str();
+    /* fix bug : strint to const char*, get empty */
+    char* cptr;
+    cptr = new char[opened->getNodeName().length() + 1];
+    strcpy(cptr, opened->getNodeName().c_str());
+    const char* devName = cptr;
 
     if(m_fd >= 0)
     {
@@ -114,13 +119,17 @@ SiSDeviceIO_819_usb_hid::openDevice()
     if(isUsingIOCTL())
     {
         SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "isUsingIOCTL : true");
+        SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "open : '%s'",  devName );
         m_fd = open(devName, O_RDWR | O_NONBLOCK); // ioctl : O_NONBLOCK flag has no effect
     }
     else
     {
         SIS_LOG_D(SiSLog::getOwnerSiS(), TAG, "isUsingIOCTL : false");
+        SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "open : '%s'",  devName );
         m_fd = open(devName, O_RDWR | O_NONBLOCK);
     }
+
+    delete [] cptr;
 
     /* handle error */
     if (m_fd < 0) 

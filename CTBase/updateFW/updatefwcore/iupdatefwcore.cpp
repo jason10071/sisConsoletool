@@ -70,8 +70,8 @@ IUpdateFWCore::prepareAllBin()
 }
 
 void
-IUpdateFWCore::resetDevice()
+IUpdateFWCore::resetDevice(bool isCheckDeviceBack)
 {
     SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "%s resetDevice", SYMBOL_DO_UPDATE);
-    CTBaseCore::resetDevice();
+    CTBaseCore::resetDevice(isCheckDeviceBack);
 }

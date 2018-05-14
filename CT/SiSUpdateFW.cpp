@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
     UpdateFWCore updateFWCore(updateFWParameter);
     CTCORE_INIT(updateFWCore);
     CTCORE_EXEC(updateFWCore);
-    CTCORE_DESTROY(updateFWCore);
+    CTCORE_DESTROY(updateFWCore, false);
 
     delete updateFWParameter;
     RETURN_EXIT_CODE;

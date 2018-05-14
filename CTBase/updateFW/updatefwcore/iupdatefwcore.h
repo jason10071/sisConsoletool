@@ -23,7 +23,7 @@ protected:
 
     virtual void prepareAllBin();
 
-    void resetDevice();
+    virtual void resetDevice(bool isCheckDeviceBack = false);
 
     virtual void prepareBinMasterRef() = 0;
     virtual void prepareXramMasterRef() = 0;

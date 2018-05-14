@@ -28,7 +28,7 @@ int main(int argc, char *argv[])
     GetFirmwareInfoCore getFirmwareInfoCore(getFirmwareInfoParameter);
     CTCORE_INIT(getFirmwareInfoCore);
     CTCORE_EXEC(getFirmwareInfoCore);
-    CTCORE_DESTROY(getFirmwareInfoCore);
+    CTCORE_DESTROY(getFirmwareInfoCore, true);
 
     delete getFirmwareInfoParameter;
     RETURN_EXIT_CODE;

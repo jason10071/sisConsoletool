@@ -164,7 +164,7 @@ ISiSProcedure::openDevice(std::string deviceID)
 }
 
 std::string
-ISiSProcedure::reOpenDevice(std::string deviceIDOpened, int waitResetSec)
+ISiSProcedure::reOpenDevice(std::string deviceIDOpened, int waitResetSec, bool isCheckDeviceBack)
 {
     if( m_sisDeviceIO == 0 )
     {
@@ -191,7 +191,15 @@ ISiSProcedure::reOpenDevice(std::string deviceIDOpened, int waitResetSec)
 
         try
         {
-            deviceIDReOpened = openDevice( deviceIDOpened );
+            if( isCheckDeviceBack )
+            {
+                SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "isCheckDeviceBack : true" );
+                deviceIDReOpened = openDevice( deviceIDOpened );
+            }
+            else
+            {
+                SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "isCheckDeviceBack : false" );
+            }
             break;
         }
         catch(SPException sp)
@@ -215,21 +223,24 @@ ISiSProcedure::reOpenDevice(std::string deviceIDOpened, int waitResetSec)
     SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "force to wait device ready : %d (sec)", forceToWaitDeviceReadySec );
     IAttributeReader::milliSleep(forceToWaitDeviceReadySec * 1000);
 
-    /* disableCtlReportToOs */
-    disableCtlReportToOs();
+    if( isCheckDeviceBack )
+    {
+        /* disableCtlReportToOs */
+        disableCtlReportToOs();
+    }
 
     return deviceIDReOpened;
 }
 
 void
-ISiSProcedure::resetDevice(int waitResetSec)
+ISiSProcedure::resetDevice(int waitResetSec, bool isCheckDeviceBack)
 {
     /* softReset */
     softReset();
 
     /* re-open device */
     std::string deviceNameOpened = m_sisDeviceIO->deviceNameOpened();
-    reOpenDevice(deviceNameOpened, waitResetSec);
+    reOpenDevice(deviceNameOpened, waitResetSec, isCheckDeviceBack);
 }
 
 std::string

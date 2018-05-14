@@ -84,9 +84,17 @@ CTBaseCore::init()
 }
 
 void
-CTBaseCore::destroy()
+CTBaseCore::destroy(bool isEnableCtlReportToOs)
 {
-    enableCtlReportToOs();
+    if(isEnableCtlReportToOs)
+    {
+        SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "isEnableCtlReportToOs : true");
+        enableCtlReportToOs();
+    }
+    else
+    {
+        SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "isEnableCtlReportToOs : false");
+    }
 }
 
 CTBaseReference*
@@ -178,9 +186,9 @@ CTBaseCore::jumpBootloader(int chipIndex)
 }
 
 void
-CTBaseCore::resetDevice()
+CTBaseCore::resetDevice(bool isCheckDeviceBack)
 {
-    m_sisProcedure->resetDevice( m_ctBaseParameter->getWaitResetSec() );
+    m_sisProcedure->resetDevice( m_ctBaseParameter->getWaitResetSec(), isCheckDeviceBack );
 }
 
 void

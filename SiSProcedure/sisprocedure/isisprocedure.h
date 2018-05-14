@@ -37,13 +37,13 @@ public:
 
     /* ctrl function */
     virtual std::string openDevice(std::string deviceID);
-    virtual std::string reOpenDevice(std::string deviceIDOpened, int waitResetSec);
+    virtual std::string reOpenDevice(std::string deviceIDOpened, int waitResetSec, bool isCheckDeviceBack = false);
     virtual void disableCtlReportToOs() = 0;
     virtual void enableCtlReportToOs() = 0;
     virtual void jumpBootloader(int chipIndex) = 0;
     virtual void softReset() = 0;
     virtual void reCalibration(int waitResetSec) = 0;
-    virtual void resetDevice(int waitResetSec);
+    virtual void resetDevice(int waitResetSec, bool isCheckDeviceBack = false);
 
     /* read function */
     virtual std::string readPID();

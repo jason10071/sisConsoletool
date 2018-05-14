@@ -72,11 +72,21 @@ UpdateFWCore_general::exec()
         if( ifNeedRestructureBootloader(CI_MASTER) )
         {
             restructureBootloader(CI_MASTER);
-            resetDevice();
+            resetDevice(true);
         }
 
         masterRecovery();
-        resetDevice();
+        if( getUpdateFWReference(RS_XRAM, CI_MASTER)->getSlaveNum() > 0 )
+        {
+            /* havs slave, so need to wait device back, and then do slave update */
+            SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "havs slave, need to wait device back.");
+            resetDevice(true);
+        }
+        else
+        {
+            SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "no slave, not need to wait device back.");
+            resetDevice();
+        }
     }
 
     /* prepare Xram Slave Ref */
@@ -1129,11 +1139,11 @@ UpdateFWCore_general::restructureBootloader()
     if( !getUpdateFWReference(RS_XRAM, CI_MASTER)->getIsRecoveryDone() )
     {
         restructureBootloader(CI_MASTER);
-        resetDevice();
+        resetDevice(true);
         masterRecovery();
     }
 
-    resetDevice();
+    resetDevice(true);
 
     SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "%s restructureBootloader : done", SYMBOL_DO_UPDATE);
 }

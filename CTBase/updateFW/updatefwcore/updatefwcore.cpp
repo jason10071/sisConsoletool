@@ -218,7 +218,7 @@ UpdateFWCore::exec()
 }
 
 void
-UpdateFWCore::destroy()
+UpdateFWCore::destroy(bool isEnableCtlReportToOs)
 {
     if( m_updateFWParameter->getDisableSoftReset() )
     {
@@ -226,7 +226,15 @@ UpdateFWCore::destroy()
     }
     else
     {
-        enableCtlReportToOs();
+        if(isEnableCtlReportToOs)
+        {
+            SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "isEnableCtlReportToOs : true");
+            enableCtlReportToOs();
+        }
+        else
+        {
+            SIS_LOG_I(SiSLog::getOwnerSiS(), TAG, "isEnableCtlReportToOs : false");
+        }
     }
 }
 

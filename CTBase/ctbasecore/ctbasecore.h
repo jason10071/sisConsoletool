@@ -21,7 +21,7 @@ public:
 
     virtual void init();
     virtual CTExitCode exec() = 0;
-    virtual void destroy();
+    virtual void destroy(bool isEnableCtlReportToOs = true);
 
 protected:
     CTExitCode undoException(std::string exceptionTitle);
@@ -34,7 +34,7 @@ protected:
     void disableCtlReportToOs();
     void enableCtlReportToOs();
     void jumpBootloader(int chipIndex);
-    void resetDevice();
+    virtual void resetDevice(bool isCheckDeviceBack = false);
 
     virtual void prepareBaseXramMasterRef(bool stopIfBroken);
 

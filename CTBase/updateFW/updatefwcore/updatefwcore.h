@@ -22,7 +22,7 @@ public:
 
     virtual void init();
     virtual CTExitCode exec();
-    virtual void destroy();
+    virtual void destroy(bool isEnableCtlReportToOs = true);
 
 protected:
     virtual void prepareBinMasterRef() {}

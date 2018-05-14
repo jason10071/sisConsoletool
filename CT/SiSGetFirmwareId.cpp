@@ -29,7 +29,7 @@ int main(int argc, char *argv[])
     GetFirmwareIdCore getFirmwareIdCore(getFirmwareIdParameter);
     CTCORE_INIT(getFirmwareIdCore);
     CTCORE_EXEC(getFirmwareIdCore);
-    CTCORE_DESTROY(getFirmwareIdCore);
+    CTCORE_DESTROY(getFirmwareIdCore, true);
 
     delete getFirmwareIdParameter;
     RETURN_EXIT_CODE;

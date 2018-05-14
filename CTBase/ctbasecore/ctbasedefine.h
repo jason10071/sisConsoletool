@@ -215,12 +215,12 @@ catch(...)\
 /* =============================================================================
 * CTCORE_DESTROY
 ============================================================================= */
-#define CTCORE_DESTROY(ctCore)\
+#define CTCORE_DESTROY(ctCore, isEnableCtlReportToOs)\
 SIS_LOG_I(SiSLog::getOwnerSiS(), "CTCORE_DESTROY", "");\
 SIS_LOG_I(SiSLog::getOwnerSiS(), "CTCORE_DESTROY", "CTCORE DESTROY :");\
 try\
 {\
-    ctCore.destroy();\
+    ctCore.destroy(isEnableCtlReportToOs);\
 }\
 catch(CTException ct)\
 {\
