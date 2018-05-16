@@ -120,8 +120,8 @@ GetFirmwareIdCore_general::showFirmwareId()
     unsigned char* idData = xramMasterRef->getFirmwareID()->getData();
 	if( xramMasterRef->getFirmwareID()->getSize() == 14 && !xramMasterRef->isBroken() )
 	{
-        major = idData[13];
-        minor = idData[12];
+        major = idData[12]; // (0x400e, 1bytes): FW major version
+        minor = idData[13]; // (0x400f, 1bytes): FW small version
 	}
     SIS_LOG_I( SiSLog::getOwnerSiS(), TAG, "Active Firmware Version : %d.%d\n", major, minor );
 
