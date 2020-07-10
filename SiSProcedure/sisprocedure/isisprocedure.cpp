@@ -445,8 +445,47 @@ ISiSProcedure::readBinDeviceType(int chipIndex)
                   dataBuf0x020cXram[2] == 0x69 &&
                   dataBuf0x020cXram[3] == 0x53) )
     {
-        deviceType = DT_819;
+        deviceType = DT_819;    //65 series - hydra
 
+    }
+    else if ( dataSize0x0200Xram == EXPECT_SIZE_FA_0X0200_XRAM &&
+              (dataBuf0x0200Xram[0] == 0x64 &&
+               dataBuf0x0200Xram[1] == 0x72 &&
+               dataBuf0x0200Xram[2] == 0x61 &&
+               dataBuf0x0200Xram[3] == 0x63 &&
+               dataBuf0x0200Xram[4] == 0x6f) &&
+              (dataBuf0x020cXram[0] == 0x00 &&
+               dataBuf0x020cXram[1] == 0x53 &&
+               dataBuf0x020cXram[2] == 0x69 &&
+               dataBuf0x020cXram[3] == 0x53) )
+    {
+        deviceType = DT_819;    //64 series - draco
+    }
+    else if ( dataSize0x0200Xram == EXPECT_SIZE_FA_0X0200_XRAM &&
+              (dataBuf0x0200Xram[0] == 0x6c &&
+               dataBuf0x0200Xram[1] == 0x69 &&
+               dataBuf0x0200Xram[2] == 0x62 &&
+               dataBuf0x0200Xram[3] == 0x72 &&
+               dataBuf0x0200Xram[4] == 0x61) &&
+              (dataBuf0x020cXram[0] == 0x00 &&
+               dataBuf0x020cXram[1] == 0x53 &&
+               dataBuf0x020cXram[2] == 0x69 &&
+               dataBuf0x020cXram[3] == 0x53) )
+    {
+        deviceType = DT_819;   //67 series - libra
+    }
+    else if ( dataSize0x0200Xram == EXPECT_SIZE_FA_0X0200_XRAM &&
+              (dataBuf0x0200Xram[0] == 0x63 &&
+               dataBuf0x0200Xram[1] == 0x61 &&
+               dataBuf0x0200Xram[2] == 0x6c &&
+               dataBuf0x0200Xram[3] == 0x6c &&
+               dataBuf0x0200Xram[4] == 0x69) &&
+              (dataBuf0x020cXram[0] == 0x00 &&
+               dataBuf0x020cXram[1] == 0x53 &&
+               dataBuf0x020cXram[2] == 0x69 &&
+               dataBuf0x020cXram[3] == 0x53) )
+    {
+        deviceType = DT_819;   //7701 series - calli
     }
     else
     {
