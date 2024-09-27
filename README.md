@@ -1,15 +1,23 @@
-Requirement
----
-    1. Linux x86 or x86_64 platform
-    2. Java
-        * JDK 6 (JRE alone is not sufficient)
-        * Apache Ant 1.8 or later
-    3. Android Developer Tool Kit (http://developer.android.com/sdk/index.html)
-        * SDK
-        * NDK
-        * eclipse (optional)
+System requirement
+- Ubuntu 14.04 or higher
+- [Yocto SDK](https://drive.google.com/file/d/1tu3uZDmJ5V4szkXpgja05D6zrZ-gqPg0/view?usp=sharing)
 
-Compilation
----
-    Just type 'make' on the root directory os this projecct
-    $ make
+Setup SDK
+```
+run sdk installation script
+set build environment by 
+. ./environment-setup-cortexa9hf-neon-poky-linux-gnueabi
+```
+Make SiS tool
+```
+    make
+```
+Parameters
+```
+    -ba 
+    -n=<i2c deivce node>
+    -n=/dev/sis_hydra_touch_device 
+    -io-interval=<milliseconds dealy>
+    -io-interval=2
+    -debug
+```

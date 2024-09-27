@@ -47,7 +47,7 @@
 
 #include <errno.h>
 
-#define OUTPUT_IGNORE 4
+#define OUTPUT_IGNORE 0
 
 //HEADER_LENGTH is the byte count before Length field
 #define BEFORE_LENGTH_FIELD_BYTES 2
@@ -231,17 +231,19 @@ SiSDeviceIO_819_hid_over_i2c::readData( unsigned char * buf, int size, int timeo
 
         if( ret > 0 )
         {
+            // The default use getReportIdIndex(false) and don't need
+            // add extra byte0 and byte1.
             /* insert byte0(Length field LSB) and byte1(Length field MSB) */
-            ret += 2;
-            char lengthLSB = ret & 0xff;
-            char lengthMSB = (ret >> 8) & 0xff;
-		
-            for(int i = ret - 1; i > 1; i--)
-            {
-                buf[i] = buf[i - 2];
-            }
-            buf[0] = lengthLSB;
-            buf[1] = lengthMSB;
+            // ret += 2;
+            // char lengthLSB = ret & 0xff;
+            // char lengthMSB = (ret >> 8) & 0xff;
+        
+            // for(int i = ret - 1; i > 1; i--)
+            // {
+            //     buf[i] = buf[i - 2];
+            // }
+            // buf[0] = lengthLSB;
+            // buf[1] = lengthMSB;
             /* --- */
         }
     }

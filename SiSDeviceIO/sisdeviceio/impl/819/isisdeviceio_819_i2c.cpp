@@ -37,7 +37,7 @@ ISiSDeviceIO_819_i2c::burnToROM(unsigned int address, int size, unsigned char* b
 
     while ( sendLegnth < size )
     {
-        unsigned int blockSize = size > sendLegnth + __8K ? __8K : size - sendLegnth;
+        unsigned int blockSize = size > sendLegnth + __4K ? __4K : size - sendLegnth;
         sendLegnth += blockSize;
 
         int pageNum = blockSize / dataLength + (blockSize % dataLength == 0 ? 0 : 1 );

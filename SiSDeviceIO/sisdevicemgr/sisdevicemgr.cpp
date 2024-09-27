@@ -51,7 +51,7 @@ using namespace SiS;
 
 /* SiS device node name */
 #define SIS_TOUCH_USB_HIDRAW "/dev/sis_touch_usb_hidraw"
-#define SIS_TOUCH_I2C_HIDRAW "/dev/sis_touch_i2c_hidraw"
+#define SIS_TOUCH_I2C_HIDRAW "/dev/sis_hydra_touch_device"
 //----------------------
 
 SiSDeviceMgr::SiSDeviceMgr() :

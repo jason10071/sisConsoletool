@@ -18,6 +18,7 @@
 #define PAGE_SIZE 256
 #define __12K 0x3000
 #define __8K 0x2000
+#define __4K 0x1000
 
 /* cmd info */
 #define DATA_86_UNIT_64 52
