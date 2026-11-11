@@ -4,6 +4,7 @@
 #include "sisdeviceio/sisdeviceexception.h"
 
 #include <fcntl.h>
+#include <sys/select.h>
 #include <sys/stat.h>
 #include <errno.h>
 
